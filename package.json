@@ -1,0 +1,27 @@
+{
+  "name": "vall-music",
+  "version": "1.0.0",
+  "description": "Vall Music — Next-Gen Studio Audio & Streaming Platform",
+  "main": "vall-server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node vall-server.js"
+  },
+  "keywords": [
+    "vall-music",
+    "streaming",
+    "audio-player",
+    "karaoke-lyrics",
+    "dsp-equalizer"
+  ],
+  "author": "Vall",
+  "license": "MIT",
+  "dependencies": {
+    "@distube/ytdl-core": "^5.0.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
+  }
+}
