@@ -1185,13 +1185,14 @@
       updateDeckPreview(track);
       document.getElementById('deck-stream-mode').innerText = 'AAC 320K';
 
-      // Direct Stream Endpoint:
-      // Executed synchronously within user tap gesture to prevent iOS Safari & Android autoplay block.
+      // Master Full-Duration Audio Stream:
+      // Uses direct proxy for imported full MP3s, or the cloud-optimized stream-play endpoint.
+      // Explicitly streams the full 3-4 minute audio track without 29s preview cutoffs.
       const directAudio = (track.downloadUrl && track.downloadUrl.startsWith('http'))
         ? `/api/music/proxy-stream?url=${encodeURIComponent(track.downloadUrl)}`
         : null;
 
-      const fullStreamUrl = directAudio || `/api/music/stream-play?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}&preview=${encodeURIComponent(track.audioUrl || '')}`;
+      const fullStreamUrl = directAudio || `/api/music/stream-play?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`;
 
       audioPlayer.src = fullStreamUrl;
       audioPlayer.crossOrigin = 'anonymous';
