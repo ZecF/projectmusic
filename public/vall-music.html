@@ -3,35 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0a0b0e">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Vall Music — Streaming Audio Berkualitas Tinggi</title>
+  <meta name="theme-color" content="#090a0d">
+  <title>Vall Music — Studio Audio Minimalis</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
+    /* Hallmark Stamp: Studio Deck Minimal / Clean Audiophile Canvas */
     :root {
-      --bg-base: #0a0b0e;
-      --bg-surface: #12141c;
-      --bg-surface-hover: #1a1d29;
-      --bg-surface-elevated: #161822;
-      --border-subtle: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.14);
-      --accent-primary: #f8fafc;
-      --accent-brand: #6366f1;
-      --accent-brand-light: #818cf8;
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-tertiary: #64748b;
+      --bg-canvas: #090a0d;
+      --bg-panel: #111318;
+      --bg-panel-hover: #171922;
+      --bg-elevated: #1a1d26;
+      --border-line: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 255, 255, 0.28);
+      --accent-signal: #22d3ee;
+      --accent-warm: #f59e0b;
+      --accent-coral: #fb7185;
+      --text-hero: #ffffff;
+      --text-body: #d1d5db;
+      --text-sub: #848a9a;
+      --text-mute: #525866;
+      --font-display: 'Syne', -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
       --radius-sm: 8px;
       --radius-md: 14px;
-      --radius-lg: 20px;
-      --radius-xl: 28px;
-      --player-height: 88px;
-      --sidebar-width: 250px;
+      --radius-lg: 22px;
+      --duration-fast: 0.18s;
+      --duration-norm: 0.28s;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -42,1816 +46,984 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    body {
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    html, body {
+      overflow-x: clip;
+      background-color: var(--bg-canvas);
+      color: var(--text-body);
+      font-family: var(--font-body);
       min-height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      position: relative;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── DYNAMIC LIVING AMBIENT AURA ── */
-    .ambient-aura-stage {
+    /* Subtle Acoustic Backdrop */
+    .ambient-acoustic-aura {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      inset: 0;
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
-      background: #08090d;
-      transition: filter 1s ease;
+      background: radial-gradient(circle at 18% 25%, rgba(34, 211, 238, 0.07) 0%, transparent 45%),
+                  radial-gradient(circle at 82% 75%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
+                  #090a0d;
+      transition: opacity 0.8s ease;
     }
 
-    .aura-orb {
-      position: absolute;
-      border-radius: 50%;
-      mix-blend-mode: screen;
-      filter: blur(95px);
-      transition: transform 1.2s ease, opacity 0.8s ease, background 1.5s ease;
-      will-change: transform, filter;
+    .ambient-acoustic-aura.is-playing {
+      opacity: 1;
     }
 
-    /* When Paused: Subtle dim ambient glow */
-    .ambient-aura-stage.is-paused .aura-orb {
-      animation-play-state: paused;
-      opacity: 0.18;
+    .ambient-acoustic-aura.is-paused {
+      opacity: 0.45;
     }
 
-    /* When Playing: Dynamic living movement & rich glowing color cycle */
-    .ambient-aura-stage.is-playing .aura-orb {
-      animation-play-state: running;
-      opacity: 0.85;
-    }
-
-    .orb-primary {
-      width: 650px;
-      height: 650px;
-      top: -10%;
-      right: 5%;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.75) 0%, rgba(99, 102, 241, 0.4) 45%, transparent 70%);
-      animation: orbDrift1 14s ease-in-out infinite alternate, auraHueCycle 20s linear infinite;
-    }
-
-    .orb-secondary {
-      width: 600px;
-      height: 600px;
-      bottom: 5%;
-      left: 5%;
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.7) 0%, rgba(16, 185, 129, 0.4) 50%, transparent 70%);
-      animation: orbDrift2 18s ease-in-out infinite alternate, auraHueCycle 25s linear infinite reverse;
-    }
-
-    .orb-tertiary {
-      width: 540px;
-      height: 540px;
-      top: 30%;
-      left: 28%;
-      background: radial-gradient(circle, rgba(244, 63, 94, 0.65) 0%, rgba(236, 72, 153, 0.35) 50%, transparent 70%);
-      animation: orbDrift3 16s ease-in-out infinite alternate;
-    }
-
-    .orb-quaternary {
-      width: 720px;
-      height: 720px;
-      bottom: -15%;
-      right: -10%;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.6) 0%, rgba(239, 68, 68, 0.35) 50%, transparent 70%);
-      animation: orbDrift4 22s ease-in-out infinite alternate;
-    }
-
-    @keyframes orbDrift1 {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-140px, 90px) scale(1.18); }
-      100% { transform: translate(70px, 160px) scale(0.92); }
-    }
-
-    @keyframes orbDrift2 {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(160px, -120px) scale(1.22); }
-      100% { transform: translate(90px, 70px) scale(0.94); }
-    }
-
-    @keyframes orbDrift3 {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-120px, -90px) scale(1.28); }
-      100% { transform: translate(140px, 110px) scale(0.88); }
-    }
-
-    @keyframes orbDrift4 {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-90px, -140px) scale(1.14); }
-      100% { transform: translate(-160px, 50px) scale(1.25); }
-    }
-
-    @keyframes auraHueCycle {
-      0% { filter: blur(95px) hue-rotate(0deg); }
-      50% { filter: blur(115px) hue-rotate(180deg); }
-      100% { filter: blur(95px) hue-rotate(360deg); }
-    }
-
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 99px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    /* App Container Layout */
-    .app-viewport {
+    /* Layout Shell */
+    .studio-shell {
       position: relative;
       z-index: 1;
-      display: flex;
-      height: calc(100vh - var(--player-height));
-      overflow: hidden;
-    }
-
-    /* ── 1. SIDEBAR (MINIMALIST & EDITORIAL) ── */
-    .sidebar-panel {
-      width: var(--sidebar-width);
-      background: rgba(14, 15, 22, 0.95);
-      border-right: 1px solid var(--border-subtle);
-      padding: 24px 18px;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 32px 120px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      flex-shrink: 0;
-      overflow-y: auto;
+      gap: 28px;
+      min-height: 100vh;
     }
 
-    .brand-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 4px 6px;
-      cursor: pointer;
-    }
-
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      background: #1e2130;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .brand-meta h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #fff;
-      line-height: 1.1;
-    }
-
-    .brand-meta span {
-      font-size: 0.68rem;
-      color: var(--text-tertiary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .nav-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .nav-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-tertiary);
-      padding: 0 10px 6px;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      color: var(--text-secondary);
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-
-    .nav-link i {
-      font-size: 15px;
-      width: 18px;
-      text-align: center;
-      color: var(--text-tertiary);
-      transition: color 0.2s;
-    }
-
-    .nav-link:hover {
-      background: var(--bg-surface-hover);
-      color: var(--text-primary);
-    }
-
-    .nav-link:hover i {
-      color: var(--text-primary);
-    }
-
-    .nav-link.active {
-      background: #1c1f2e;
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .nav-link.active i {
-      color: var(--accent-brand-light);
-    }
-
-    .nav-count {
-      margin-left: auto;
-      font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-tertiary);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2px 7px;
-      border-radius: 99px;
-    }
-
-    /* Direct Import Card */
-    .import-dock-card {
-      margin-top: auto;
-      background: linear-gradient(145deg, rgba(99, 102, 241, 0.12) 0%, rgba(20, 24, 33, 0.6) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .import-dock-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--accent-brand-light);
-    }
-
-    .import-dock-card p {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    .btn-import-action {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 9px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: transform 0.15s, background 0.15s;
-    }
-
-    .btn-import-action:hover {
-      background: #f1f5f9;
-      transform: translateY(-1px);
-    }
-
-    /* ── 2. MAIN SCROLL CONTAINER ── */
-    .main-viewport {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 36px 140px 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    /* Top Navigation Header */
-    .app-topbar {
+    /* Top Compact Header */
+    .studio-top-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      flex-shrink: 0;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-line);
     }
 
-    .search-container {
+    .brand-mark-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brand-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #181b26 0%, #0d0f15 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) ease;
+    }
+
+    .brand-mark-group:hover .brand-logo-icon {
+      border-color: rgba(34, 211, 238, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .brand-title-wrap h1 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-hero);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .brand-title-wrap p {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-mute);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Clean Search Field */
+    .studio-search-bar {
       flex: 1;
-      max-width: 540px;
+      max-width: 480px;
       position: relative;
     }
 
-    .search-container i {
-      position: absolute;
-      left: 18px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-tertiary);
-      font-size: 14px;
-    }
-
-    .search-bar-input {
+    .search-text-input {
       width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
+      height: 42px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-line);
       border-radius: 99px;
-      padding: 12px 48px 12px 46px;
-      color: #fff;
-      font-size: 0.88rem;
-      font-family: inherit;
-      transition: all 0.25s ease;
+      padding: 0 44px 0 42px;
+      color: var(--text-hero);
+      font-size: 0.86rem;
+      font-family: var(--font-body);
+      transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease;
     }
 
-    .search-bar-input:focus {
-      background: #181b26;
-      border-color: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    .search-text-input:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-panel-hover);
     }
 
-    .search-shortcut-badge {
+    .search-text-input::placeholder {
+      color: var(--text-mute);
+    }
+
+    .studio-search-bar i {
       position: absolute;
-      right: 16px;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-mute);
+      font-size: 13px;
+    }
+
+    .search-shortcut-tag {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
       font-size: 0.68rem;
-      color: var(--text-tertiary);
-      background: rgba(255, 255, 255, 0.06);
-      padding: 3px 6px;
+      color: var(--text-mute);
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 4px;
       pointer-events: none;
     }
 
-    .topbar-tools {
+    /* Header Tools */
+    .top-tools-row {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .tool-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 10px 16px;
+    .tool-compact-btn {
+      height: 38px;
+      padding: 0 16px;
       border-radius: 99px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-line);
+      color: var(--text-sub);
       font-size: 0.82rem;
       font-weight: 600;
-      cursor: pointer;
-      display: flex;
+      font-family: var(--font-body);
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s ease;
+      cursor: pointer;
+      transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease, border-color var(--duration-fast) ease;
     }
 
-    .tool-btn:hover {
-      background: var(--bg-surface-hover);
+    .tool-compact-btn:hover {
+      background: var(--bg-panel-hover);
+      color: var(--text-hero);
+      border-color: var(--border-focus);
+    }
+
+    .tool-compact-btn.is-active {
+      background: var(--bg-elevated);
       color: #fff;
-      border-color: var(--border-hover);
+      border-color: var(--accent-signal);
     }
 
-    .tool-btn.active {
-      background: #fff;
-      color: #000;
-      border-color: #fff;
+    /* ── TWO-COLUMN STUDIO STAGE ── */
+    .stage-split-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 36px;
+      align-items: start;
     }
 
-    /* ── 3. HERO EDITORIAL SHOWCASE BANNER ── */
-    .hero-spotlight {
-      background: linear-gradient(135deg, #171926 0%, #10121a 100%);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 36px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 32px;
-      position: relative;
-      overflow: hidden;
-      flex-shrink: 0;
-      min-height: 240px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .hero-editorial-meta {
-      max-width: 620px;
-      flex: 1;
+    /* ── LEFT COLUMN: ACOUSTIC PLAYER DECK ── */
+    .deck-player-column {
+      position: sticky;
+      top: 24px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      z-index: 2;
-    }
-
-    .hero-status-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .badge-pill {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 4px 10px;
-      border-radius: 99px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-    }
-
-    .badge-pill.highlight {
-      background: rgba(99, 102, 241, 0.18);
-      color: var(--accent-brand-light);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-    }
-
-    .hero-song-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      color: #fff;
-      word-break: break-word;
-    }
-
-    .hero-song-desc {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-top: 8px;
-    }
-
-    .btn-primary-play {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 12px 26px;
-      border-radius: 99px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform 0.2s, background 0.2s;
-    }
-
-    .btn-primary-play:hover {
-      background: #f1f5f9;
-      transform: scale(1.03);
-    }
-
-    .btn-secondary-action {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-subtle);
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 99px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-secondary-action:hover {
-      background: rgba(255, 255, 255, 0.14);
-      border-color: var(--border-hover);
-    }
-
-    /* Hero Vinyl Sleeve Presentation */
-    .hero-vinyl-wrapper {
-      position: relative;
-      width: 170px;
-      height: 170px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero-vinyl-disc {
-      position: absolute;
-      right: -24px;
-      width: 155px;
-      height: 155px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #050608 0%, #151821 50%, #08090d 100%);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hero-vinyl-disc::before {
-      content: '';
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #1e2130;
-      border: 4px solid #000;
-    }
-
-    .hero-vinyl-wrapper:hover .hero-vinyl-disc,
-    .hero-vinyl-wrapper.spinning .hero-vinyl-disc {
-      transform: translateX(35px) rotate(120deg);
-    }
-
-    .hero-cover-art {
-      position: relative;
-      z-index: 2;
-      width: 165px;
-      height: 165px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .hero-cover-art img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* ── 4. CATEGORY PILL TABS ── */
-    .category-scroll-tabs {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      flex-shrink: 0;
-    }
-
-    .tab-pill-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 9px 18px;
-      border-radius: 99px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tab-pill-btn:hover {
-      background: var(--bg-surface-hover);
-      color: #fff;
-    }
-
-    .tab-pill-btn.active {
-      background: #fff;
-      color: #000;
-      border-color: #fff;
-    }
-
-    /* ── 5. TRACK SECTION & CONTROLS ── */
-    .section-controls-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-      margin-bottom: 4px;
-    }
-
-    .section-heading-text {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-meta-count {
-      font-size: 0.8rem;
-      color: var(--text-tertiary);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 500;
-    }
-
-    /* Grid Layout */
-    .tracks-card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
       gap: 20px;
     }
 
-    .music-track-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
+    .acoustic-deck-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius-lg);
+      padding: 28px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      cursor: pointer;
+      gap: 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .deck-art-frame {
       position: relative;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s, border-color 0.25s;
-    }
-
-    .music-track-card:hover {
-      background: var(--bg-surface-hover);
-      border-color: var(--border-hover);
-      transform: translateY(-4px);
-    }
-
-    .music-track-card.is-active {
-      background: #181c2c;
-      border-color: rgba(99, 102, 241, 0.4);
-    }
-
-    .card-thumbnail-box {
       width: 100%;
-      aspect-ratio: 1;
-      border-radius: var(--radius-sm);
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-md);
       overflow: hidden;
-      position: relative;
-      background: #0d0f17;
+      background: #000;
+      border: 1px solid var(--border-line);
     }
 
-    .card-thumbnail-box img {
+    .deck-art-frame img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.35s ease;
+      display: block;
+      transition: transform 0.4s var(--ease-out);
     }
 
-    .music-track-card:hover .card-thumbnail-box img {
-      transform: scale(1.04);
+    .ambient-acoustic-aura.is-playing ~ .studio-shell .deck-art-frame img {
+      transform: scale(1.02);
     }
 
-    /* Floating Play Circle Overlay */
-    .card-play-action {
-      position: absolute;
-      right: 12px;
-      bottom: 12px;
-      width: 42px;
-      height: 42px;
-      background: #fff;
-      color: #000;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .music-track-card:hover .card-play-action,
-    .music-track-card.is-active .card-play-action {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .music-track-card.is-active .card-play-action {
-      background: var(--accent-brand);
-      color: #fff;
-    }
-
-    .card-info-box {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .card-track-title {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-track-artist {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-footer-row {
+    .deck-badge-line {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 4px;
-      font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-tertiary);
     }
 
-    .btn-track-heart {
-      background: none;
+    .deck-source-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent-signal);
+      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .deck-like-trigger {
+      background: transparent;
       border: none;
-      color: var(--text-tertiary);
-      font-size: 14px;
+      color: var(--text-mute);
+      font-size: 16px;
       cursor: pointer;
-      transition: color 0.15s;
+      transition: color var(--duration-fast) ease, transform var(--duration-fast) ease;
     }
 
-    .btn-track-heart:hover, .btn-track-heart.active {
-      color: #ef4444;
+    .deck-like-trigger:hover,
+    .deck-like-trigger.is-fav {
+      color: var(--accent-coral);
+      transform: scale(1.1);
     }
 
-    /* ── 6. FLOATING DOCK AUDIO PLAYER ── */
-    .dock-player {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      height: var(--player-height);
-      background: rgba(12, 14, 20, 0.96);
-      backdrop-filter: blur(30px);
-      border-top: 1px solid var(--border-subtle);
-      z-index: 100;
-      display: grid;
-      grid-template-columns: 300px 1fr 300px;
-      align-items: center;
-      padding: 0 32px;
-    }
-
-    /* Left: Active Track Meta */
-    .dock-left-meta {
+    .deck-track-titles {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      overflow: hidden;
-    }
-
-    .dock-cover-thumb {
-      width: 54px;
-      height: 54px;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      flex-shrink: 0;
-      background: #181a24;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .dock-cover-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .dock-text-meta {
-      overflow: hidden;
-    }
-
-    .dock-track-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .dock-track-sub {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 6px;
     }
 
-    .stream-quality-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      background: rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-      padding: 1px 5px;
-      border-radius: 4px;
+    .deck-song-name {
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-hero);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      word-break: break-word;
     }
 
-    /* Center: Transport & Waveform Seekbar */
-    .dock-center-transport {
+    .deck-song-artist {
+      font-size: 0.95rem;
+      color: var(--text-sub);
+    }
+
+    /* Scrubber Track */
+    .deck-timeline-wrap {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 8px;
-      max-width: 640px;
-      width: 100%;
-      margin: 0 auto;
     }
 
-    .transport-controls-row {
+    .rail-scrub-bar {
+      position: relative;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      cursor: pointer;
+    }
+
+    .rail-scrub-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--text-hero);
+      border-radius: 99px;
+      pointer-events: none;
+    }
+
+    .rail-time-digits {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-mute);
+    }
+
+    /* Transport Primary Controls */
+    .deck-transport-bar {
       display: flex;
       align-items: center;
-      gap: 22px;
+      justify-content: space-between;
+      padding-top: 4px;
     }
 
-    .transport-btn {
-      background: none;
+    .btn-circle-cmd {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: transparent;
       border: none;
-      color: var(--text-secondary);
+      color: var(--text-sub);
       font-size: 15px;
       cursor: pointer;
-      transition: color 0.2s, transform 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
     }
 
-    .transport-btn:hover {
-      color: #fff;
+    .btn-circle-cmd:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-hero);
     }
 
-    .transport-btn.active {
-      color: var(--accent-brand-light);
+    .btn-circle-cmd.is-active {
+      color: var(--accent-signal);
     }
 
-    .btn-master-play {
-      width: 40px;
-      height: 40px;
+    .btn-primary-playback {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
       background: #fff;
       color: #000;
-      border-radius: 50%;
-      font-size: 16px;
-      transition: transform 0.15s, background 0.15s;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) ease;
     }
 
-    .btn-master-play:hover {
+    .btn-primary-playback:hover {
       transform: scale(1.06);
       background: #f1f5f9;
     }
 
-    .progress-seek-row {
+    /* Volume Rail */
+    .deck-sub-controls {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-line);
       gap: 12px;
-      width: 100%;
     }
 
-    .timestamp-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--text-tertiary);
-      width: 36px;
-      text-align: center;
-    }
-
-    .scrub-track-bar {
-      flex: 1;
-      position: relative;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 99px;
-      cursor: pointer;
-    }
-
-    .scrub-fill-bar {
-      height: 100%;
-      background: #fff;
-      border-radius: 99px;
-      width: 0%;
-      position: relative;
-    }
-
-    .scrub-track-bar:hover .scrub-fill-bar {
-      background: var(--accent-brand-light);
-    }
-
-    .scrub-fill-bar::after {
-      content: '';
-      position: absolute;
-      right: -4px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 10px;
-      height: 10px;
-      background: #fff;
-      border-radius: 50%;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    .scrub-track-bar:hover .scrub-fill-bar::after {
-      opacity: 1;
-    }
-
-    /* Right: Audio Features & Volume */
-    .dock-right-tools {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 16px;
-    }
-
-    .volume-group {
+    .deck-vol-group {
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 110px;
+      flex: 1;
     }
 
-    .volume-range-slider {
+    .vol-fader-input {
       -webkit-appearance: none;
       width: 100%;
-      height: 4px;
+      max-width: 120px;
+      height: 3px;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 99px;
       cursor: pointer;
     }
 
-    .volume-range-slider::-webkit-slider-thumb {
+    .vol-fader-input::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 10px;
       height: 10px;
+      border-radius: 50%;
       background: #fff;
-      border-radius: 50%;
-      cursor: pointer;
     }
 
-    /* ── 7. SYNCHRONIZED LYRICS MODAL (APPLE MUSIC STYLE) ── */
-    .lyrics-view-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - var(--player-height));
-      background: rgba(10, 11, 16, 0.96);
-      backdrop-filter: blur(50px);
-      z-index: 95;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-    }
-
-    .lyrics-view-container.show {
-      display: flex;
-    }
-
-    .lyrics-app-header {
-      width: 100%;
-      max-width: 720px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-
-    .lyrics-song-heading h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
-    .lyrics-song-heading p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .btn-dismiss-lyrics {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .lyrics-flow-scroll {
-      width: 100%;
-      max-width: 720px;
-      height: 62vh;
-      overflow-y: auto;
-      text-align: center;
+    /* ── RIGHT COLUMN: CURATED FEED & CATALOG ── */
+    .catalog-feed-column {
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      padding: 60px 0;
-      mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      gap: 22px;
     }
 
-    .lyric-phrase-line {
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.25);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      cursor: pointer;
-      line-height: 1.4;
-    }
-
-    .lyric-phrase-line:hover {
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    .lyric-phrase-line.is-active-line {
-      color: #ffffff;
-      font-size: 1.75rem;
-      font-weight: 800;
-      transform: scale(1.04);
-    }
-
-    /* ── 8. STUDIO EQUALIZER DRAWER ── */
-    .equalizer-drawer-box {
-      position: fixed;
-      bottom: calc(var(--player-height) + 16px);
-      right: 28px;
-      width: 440px;
-      background: #141622;
-      border: 1px solid var(--border-hover);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      z-index: 105;
-      display: none;
-      flex-direction: column;
-      gap: 18px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-    }
-
-    .equalizer-drawer-box.show {
-      display: flex;
-    }
-
-    .eq-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .eq-title-label {
-      font-size: 0.95rem;
-      font-weight: 700;
+    /* Category Pill Selector */
+    .filter-pills-row {
       display: flex;
       align-items: center;
       gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
     }
 
-    .eq-preset-chip-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+    .filter-pills-row::-webkit-scrollbar {
+      display: none;
     }
 
-    .eq-chip-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 4px 10px;
+    .chip-pill-action {
+      height: 34px;
+      padding: 0 16px;
       border-radius: 99px;
-      font-size: 0.72rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-line);
+      color: var(--text-sub);
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease, border-color var(--duration-fast) ease;
     }
 
-    .eq-chip-btn.active, .eq-chip-btn:hover {
+    .chip-pill-action:hover {
+      background: var(--bg-panel-hover);
+      color: var(--text-hero);
+    }
+
+    .chip-pill-action.is-selected {
       background: #fff;
       color: #000;
       border-color: #fff;
-    }
-
-    .eq-sliders-rack {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 140px;
-      padding: 10px 0;
-    }
-
-    .eq-column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      height: 100%;
-    }
-
-    .eq-vertical-input {
-      -webkit-appearance: slider-vertical;
-      width: 6px;
-      flex: 1;
-      cursor: pointer;
-    }
-
-    .eq-freq-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-tertiary);
-    }
-
-    .eq-db-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--accent-brand-light);
       font-weight: 700;
     }
 
-    /* ── 9. LINK IMPORT MODAL ── */
-    .import-link-modal {
+    /* Feed Header */
+    .catalog-meta-headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .catalog-meta-headline h2 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-hero);
+      letter-spacing: -0.01em;
+    }
+
+    .feed-count-pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-mute);
+    }
+
+    /* Minimal Track Index List */
+    .track-index-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stream-track-card {
+      display: grid;
+      grid-template-columns: 32px 46px 1fr 110px 40px;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+      cursor: pointer;
+    }
+
+    .stream-track-card:hover {
+      background: var(--bg-panel);
+      border-color: var(--border-line);
+    }
+
+    .stream-track-card.is-active-row {
+      background: var(--bg-panel-hover);
+      border-color: rgba(34, 211, 238, 0.3);
+    }
+
+    .row-index-digit {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-mute);
+      text-align: center;
+    }
+
+    .stream-track-card.is-active-row .row-index-digit {
+      color: var(--accent-signal);
+    }
+
+    .row-cover-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: #000;
+    }
+
+    .row-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .row-title-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-hero);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-artist-name {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-duration-tag {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-mute);
+      text-align: right;
+    }
+
+    .row-heart-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-mute);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--duration-fast) ease, transform var(--duration-fast) ease;
+    }
+
+    .row-heart-btn:hover,
+    .row-heart-btn.is-fav {
+      color: var(--accent-coral);
+      transform: scale(1.15);
+    }
+
+    /* ── KARAOKE LYRICS MODAL DRAWER ── */
+    .studio-lyrics-overlay {
       position: fixed;
       top: 0;
-      left: 0;
-      width: 100vw;
+      right: -440px;
+      width: 420px;
+      max-width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(16px);
-      z-index: 200;
-      display: none;
+      background: rgba(14, 16, 22, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-left: 1px solid var(--border-line);
+      z-index: 80;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: right 0.35s var(--ease-out);
+      box-shadow: -16px 0 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .studio-lyrics-overlay.is-visible {
+      right: 0;
+    }
+
+    .lyrics-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lyrics-modal-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-hero);
+    }
+
+    .btn-close-modal {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-line);
+      color: var(--text-body);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .import-link-modal.show {
-      display: flex;
-    }
-
-    .import-modal-inner {
-      background: #13151f;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius-lg);
-      padding: 30px;
-      width: 90%;
-      max-width: 480px;
+    .lyrics-line-stream {
+      flex: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      gap: 16px;
+      padding-right: 6px;
     }
 
-    .modal-headline {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-headline h3 {
+    .lyric-phrase-item {
       font-size: 1.15rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
+      font-weight: 600;
+      color: var(--text-mute);
+      line-height: 1.45;
+      cursor: pointer;
+      transition: color var(--duration-fast) ease, transform var(--duration-fast) ease;
     }
 
-    .import-url-field {
+    .lyric-phrase-item:hover {
+      color: var(--text-sub);
+    }
+
+    .lyric-phrase-item.is-current-lyric {
+      color: var(--text-hero);
+      font-size: 1.35rem;
+      font-weight: 800;
+      transform: scale(1.02);
+      transform-origin: left;
+    }
+
+    /* ── LINK EXTRACTOR MODAL ── */
+    .link-extract-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .link-extract-modal.is-visible {
+      display: flex;
+    }
+
+    .extract-modal-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      max-width: 440px;
       width: 100%;
-      background: #1b1e2b;
-      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .extract-input-rail {
+      width: 100%;
+      height: 44px;
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-line);
+      padding: 0 14px;
       color: #fff;
       font-size: 0.88rem;
     }
 
-    .btn-submit-import {
+    .btn-submit-action {
+      height: 42px;
+      border-radius: 99px;
       background: #fff;
       color: #000;
-      font-weight: 700;
       border: none;
-      padding: 12px;
-      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-family: var(--font-body);
+      font-size: 0.86rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.15s;
     }
 
-    .btn-submit-import:hover {
-      background: #f1f5f9;
-    }
-
-    /* Toast Notification */
-    .system-toast {
+    /* ── TOAST MESSAGE ── */
+    .studio-toast-box {
       position: fixed;
-      bottom: calc(var(--player-height) + 20px);
+      top: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(40px);
-      background: rgba(22, 25, 36, 0.96);
-      border: 1px solid var(--border-hover);
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(18, 20, 28, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-focus);
       color: #fff;
-      padding: 10px 24px;
+      padding: 9px 20px;
       border-radius: 99px;
       font-size: 0.82rem;
       font-weight: 600;
-      z-index: 150;
+      z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: all var(--duration-norm) var(--ease-out);
     }
 
-    .system-toast.visible {
-      transform: translateX(-50%) translateY(0);
+    .studio-toast-box.is-shown {
       opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
-    /* ── MOBILE BOTTOM NAVIGATION (Hidden on Desktop) ── */
-    .mobile-bottom-nav {
-      display: none;
+    /* Focus Visible */
+    button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent-signal);
+      outline-offset: 2px;
     }
 
-    /* ── RESPONSIVE MEDIA QUERIES ── */
-
-    /* Tablet & Medium Screens (max-width: 1024px) */
-    @media (max-width: 1024px) {
-      :root {
-        --sidebar-width: 210px;
-      }
-      .main-viewport {
-        padding: 24px 28px 130px 28px;
-        gap: 24px;
-      }
-      .hero-spotlight {
-        padding: 30px;
-        gap: 24px;
-      }
-      .hero-song-title {
-        font-size: 1.85rem;
+    /* Accessibility Fallback */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
       }
     }
 
-    /* Mobile Phones & Handhelds (max-width: 768px) */
-    @media (max-width: 768px) {
-      :root {
-        --player-height: 72px;
+    /* ── RESPONSIVE COMPACT SCREENS (PHONES & TABLETS) ── */
+    @media (max-width: 960px) {
+      .stage-split-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
       }
-
-      .sidebar-panel {
-        display: none !important;
+      .deck-player-column {
+        position: relative;
+        top: 0;
       }
-
-      .app-viewport {
-        height: calc(100vh - var(--player-height) - 56px);
+      .deck-art-frame {
+        max-width: 240px;
+        margin: 0 auto;
       }
-
-      .main-viewport {
-        padding: 16px 14px 110px 14px;
-        gap: 18px;
+      .deck-song-name {
+        font-size: 1.4rem;
+        text-align: center;
       }
-
-      .app-topbar {
-        gap: 8px;
+      .deck-song-artist {
+        text-align: center;
       }
+      .deck-badge-line {
+        justify-content: center;
+        gap: 16px;
+      }
+    }
 
-      .search-container {
+    @media (max-width: 640px) {
+      .studio-shell {
+        padding: 16px 16px 100px;
+        gap: 20px;
+      }
+      .studio-top-strip {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+      }
+      .studio-search-bar {
         max-width: 100%;
       }
-
-      .topbar-tools {
-        gap: 6px;
-      }
-
-      .tool-btn span {
-        display: none;
-      }
-
-      .tool-btn {
-        padding: 10px;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        justify-content: center;
-      }
-
-      .hero-spotlight {
-        flex-direction: column-reverse;
-        text-align: center;
-        padding: 22px 16px;
-        gap: 16px;
-        min-height: auto;
-      }
-
-      .hero-song-title {
-        font-size: 1.35rem;
-      }
-
-      .hero-status-row, .hero-actions {
-        justify-content: center;
-      }
-
-      .hero-vinyl-wrapper {
-        width: 130px;
-        height: 130px;
-      }
-
-      .hero-vinyl-disc {
-        width: 120px;
-        height: 120px;
-        right: -16px;
-      }
-
-      .hero-cover-art {
-        width: 125px;
-        height: 125px;
-      }
-
-      .tracks-card-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
-
-      .music-track-card {
-        padding: 10px;
-        gap: 8px;
-      }
-
-      .card-track-title {
-        font-size: 0.85rem;
-      }
-
-      .card-track-artist {
-        font-size: 0.72rem;
-      }
-
-      /* Compact Mini Player Dock for Phones */
-      .dock-player {
-        height: var(--player-height);
-        grid-template-columns: 1fr auto;
-        padding: 0 14px;
+      .stream-track-card {
+        grid-template-columns: 24px 40px 1fr 34px;
         gap: 10px;
-        bottom: 56px;
+        padding: 8px 10px;
       }
-
-      .dock-left-meta {
-        gap: 10px;
-        max-width: 70vw;
-      }
-
-      .dock-cover-thumb {
-        width: 44px;
-        height: 44px;
-      }
-
-      .dock-track-name {
-        font-size: 0.82rem;
-      }
-
-      .dock-track-sub {
-        font-size: 0.7rem;
-      }
-
-      .progress-seek-row, #btn-shuffle-toggle, #btn-repeat-toggle, .dock-center-transport .transport-btn:not(.btn-master-play) {
+      .row-duration-tag {
         display: none;
-      }
-
-      .dock-center-transport {
-        width: auto;
-        margin: 0;
-      }
-
-      .dock-right-tools {
-        display: none;
-      }
-
-      /* Native Mobile Bottom Navigation */
-      .mobile-bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        height: 56px;
-        background: rgba(10, 11, 16, 0.98);
-        backdrop-filter: blur(24px);
-        border-top: 1px solid var(--border-subtle);
-        z-index: 101;
-        align-items: center;
-        justify-content: space-around;
-        padding: 0 10px;
-      }
-
-      .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        color: var(--text-tertiary);
-        font-size: 0.68rem;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: color 0.15s;
-      }
-
-      .mobile-nav-item i {
-        font-size: 16px;
-      }
-
-      .mobile-nav-item.active {
-        color: #fff;
-      }
-
-      .mobile-nav-item.active i {
-        color: var(--accent-brand-light);
-      }
-
-      /* Mobile Modals */
-      .lyrics-view-container {
-        padding: 24px 16px;
-      }
-
-      .lyrics-song-heading h2 {
-        font-size: 1.25rem;
-      }
-
-      .lyric-phrase-line {
-        font-size: 1.15rem;
-      }
-
-      .lyric-phrase-line.is-active-line {
-        font-size: 1.45rem;
-      }
-
-      .equalizer-drawer-box {
-        width: calc(100vw - 20px);
-        right: 10px;
-        bottom: calc(var(--player-height) + 65px);
-        padding: 16px;
-      }
-    }
-
-    /* Small Screen Devices (max-width: 380px) */
-    @media (max-width: 380px) {
-      .tracks-card-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-      .card-thumbnail-box {
-        border-radius: 6px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Living Dynamic Ambient Aura Backdrop -->
-  <div id="ambient-aura" class="ambient-aura-stage is-paused">
-    <div class="aura-orb orb-primary" id="aura-orb-1"></div>
-    <div class="aura-orb orb-secondary" id="aura-orb-2"></div>
-    <div class="aura-orb orb-tertiary" id="aura-orb-3"></div>
-    <div class="aura-orb orb-quaternary" id="aura-orb-4"></div>
-  </div>
+  <!-- Ambient Backdrop -->
+  <div class="ambient-acoustic-aura is-paused" id="ambient-aura"></div>
 
-  <!-- App Viewport -->
-  <div class="app-viewport">
+  <!-- Studio Shell -->
+  <div class="studio-shell">
 
-    <!-- ── 1. SIDEBAR ── -->
-    <aside class="sidebar-panel">
-      <div class="brand-header" onclick="selectCategory('global')">
-        <div class="brand-mark">
-          <i class="fa-solid fa-wave-square"></i>
+    <!-- Top Compact Header Strip -->
+    <header class="studio-top-strip">
+      <div class="brand-mark-group" onclick="selectCategory('global')">
+        <div class="brand-logo-icon" aria-label="Vall Music Emblem">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 7V13" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M8 4V17" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M12 8V20" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M16 5V16" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M20 9V14" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
         </div>
-        <div class="brand-meta">
-          <h1>Vall Music</h1>
-          <span>Studio Audio</span>
+        <div class="brand-title-wrap">
+          <h1>VALL MUSIC</h1>
+          <p>AUDIOPHILE DECK</p>
         </div>
       </div>
 
-      <nav class="nav-group">
-        <div class="nav-label">Jelajah</div>
-        <a class="nav-link active" onclick="selectCategory('global', this)">
-          <i class="fa-solid fa-compass"></i>
-          <span>Tangga Lagu Global</span>
-        </a>
-        <a class="nav-link" onclick="selectCategory('indonesia', this)">
-          <i class="fa-solid fa-fire"></i>
-          <span>Trending Indonesia</span>
-        </a>
-        <a class="nav-link" onclick="selectCategory('lofi', this)">
-          <i class="fa-solid fa-moon"></i>
-          <span>Santai & Lo-Fi</span>
-        </a>
-        <a class="nav-link" onclick="selectCategory('rnb', this)">
-          <i class="fa-solid fa-compact-disc"></i>
-          <span>R&B & Soul</span>
-        </a>
-        <a class="nav-link" onclick="selectCategory('acoustic', this)">
-          <i class="fa-solid fa-guitar"></i>
-          <span>Akustik Pilihan</span>
-        </a>
-      </nav>
+      <div class="studio-search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="search-text-input" id="search-input" placeholder="Cari musik, artis, atau genre..." />
+        <span class="search-shortcut-tag">/</span>
+      </div>
 
-      <nav class="nav-group">
-        <div class="nav-label">Koleksi</div>
-        <a class="nav-link" onclick="viewFavorites(this)">
-          <i class="fa-solid fa-heart"></i>
-          <span>Lagu Disukai</span>
-          <span class="nav-count" id="liked-songs-count">0</span>
-        </a>
-        <a class="nav-link" onclick="toggleLyricsModal(true)">
-          <i class="fa-solid fa-microphone-lines"></i>
-          <span>Lirik Karaoke</span>
-        </a>
-      </nav>
-
-      <!-- Direct Link Importer Box -->
-      <div class="import-dock-card">
-        <div class="import-dock-title">
-          <i class="fa-solid fa-link"></i>
-          <span>Import Tautan Audio</span>
-        </div>
-        <p>Bawa lagu langsung dari tautan track ke pemutar Vall Music.</p>
-        <button class="btn-import-action" onclick="openImportDialog()">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          <span>Input Tautan Lagu</span>
+      <div class="top-tools-row">
+        <button class="tool-compact-btn" onclick="openImportModal()" title="Ekstrak Link">
+          <i class="fa-solid fa-link" style="color:var(--accent-signal);"></i>
+          <span>Ekstrak</span>
+        </button>
+        <button class="tool-compact-btn" onclick="toggleLyricsDrawer()" id="btn-top-lyrics" title="Tampilkan Lirik">
+          <i class="fa-solid fa-align-left" style="color:var(--accent-warm);"></i>
+          <span>Lirik</span>
         </button>
       </div>
-    </aside>
+    </header>
 
-    <!-- ── 2. MAIN SCROLL VIEWPORT ── -->
-    <main class="main-viewport">
+    <!-- Main Two-Column Stage -->
+    <main class="stage-split-grid">
 
-      <!-- Top Header Navigation -->
-      <header class="app-topbar">
-        <div class="search-container">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input 
-            type="text" 
-            class="search-bar-input" 
-            id="search-input" 
-            placeholder="Cari lagu, artis, atau album..."
-            autocomplete="off"
-          />
-          <span class="search-shortcut-badge">/</span>
-        </div>
-
-        <div class="topbar-tools">
-          <button class="tool-btn" onclick="toggleEqualizerPanel()">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Equalizer 10-Band</span>
-          </button>
-          <button class="tool-btn" onclick="openImportDialog()">
-            <i class="fa-solid fa-link" style="color: var(--accent-brand-light);"></i>
-            <span>Import Tautan</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Editorial Spotlight Banner -->
-      <section class="hero-spotlight" id="hero-spotlight">
-        <div class="hero-editorial-meta">
-          <div class="hero-status-row">
-            <span class="badge-pill highlight">Rilisan Pilihan</span>
-            <span class="badge-pill">Audio Penuh HD 320k</span>
+      <!-- LEFT: ACOUSTIC PLAYER DECK -->
+      <section class="deck-player-column">
+        <div class="acoustic-deck-box">
+          
+          <div class="deck-badge-line">
+            <span class="deck-source-tag" id="deck-stream-mode">STUDIO AAC 320K</span>
+            <button class="deck-like-trigger" id="deck-heart-btn" onclick="toggleCurrentFavorite()" title="Sukai Lagu Ini">
+              <i class="fa-regular fa-heart"></i>
+            </button>
           </div>
-          <h2 class="hero-song-title" id="spotlight-title">Untungnya, Hidup Harus Tetap Berjalan</h2>
-          <p class="hero-song-desc" id="spotlight-desc">Bernadya • Menjadi track terpopuler di berbagai platform musik tanah air.</p>
-          <div class="hero-actions">
-            <button class="btn-primary-play" onclick="playSpotlightTrack()">
+
+          <div class="deck-art-frame">
+            <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500" alt="Cover Lagu" id="deck-cover-art">
+          </div>
+
+          <div class="deck-track-titles">
+            <h2 class="deck-song-name" id="deck-title-text">Pilih lagu untuk memutar</h2>
+            <p class="deck-song-artist" id="deck-artist-text">Vall Music</p>
+          </div>
+
+          <!-- Timeline Scrubber -->
+          <div class="deck-timeline-wrap">
+            <div class="rail-scrub-bar" id="scrub-bar" onclick="scrubPlayback(event)">
+              <div class="rail-scrub-fill" id="scrub-fill"></div>
+            </div>
+            <div class="rail-time-digits">
+              <span id="cur-time">0:00</span>
+              <span id="total-time">0:00</span>
+            </div>
+          </div>
+
+          <!-- Master Transport -->
+          <div class="deck-transport-bar">
+            <button class="btn-circle-cmd" id="btn-shuffle" onclick="toggleShuffle()" title="Acak">
+              <i class="fa-solid fa-shuffle"></i>
+            </button>
+            <button class="btn-circle-cmd" onclick="playPreviousTrack()" title="Sebelumnya">
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button class="btn-primary-playback" id="btn-play-trigger" onclick="togglePlayback()" title="Putar / Jeda">
               <i class="fa-solid fa-play"></i>
-              <span>Dengarkan Sekarang</span>
             </button>
-            <button class="btn-secondary-action" onclick="toggleLyricsModal(true)">
-              <i class="fa-solid fa-microphone"></i>
-              <span>Lihat Lirik</span>
+            <button class="btn-circle-cmd" onclick="playNextTrack()" title="Berikutnya">
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
+            <button class="btn-circle-cmd" id="btn-repeat" onclick="toggleRepeat()" title="Ulangi">
+              <i class="fa-solid fa-repeat"></i>
             </button>
           </div>
-        </div>
 
-        <!-- Realistic Vinyl Sleeve Presentation -->
-        <div class="hero-vinyl-wrapper" id="vinyl-wrapper">
-          <div class="hero-vinyl-disc"></div>
-          <div class="hero-cover-art">
-            <img id="spotlight-art" src="https://cdn-images.dzcdn.net/images/cover/5d284b31cb9ddeb1a0c79aede5a94e1c/500x500-000000-80-0-0.jpg" alt="Cover">
+          <!-- Sub Controls: Volume & Download -->
+          <div class="deck-sub-controls">
+            <div class="deck-vol-group">
+              <button class="btn-circle-cmd" style="width:28px;height:28px;" onclick="toggleMute()" id="btn-vol-mute">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <input type="range" class="vol-fader-input" id="vol-slider" min="0" max="1" step="0.01" value="0.8" oninput="setAudioVolume(this.value)">
+            </div>
+            <button class="btn-circle-cmd" onclick="downloadCurrentTrack()" title="Unduh MP3">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i>
+            </button>
           </div>
+
         </div>
       </section>
 
-      <!-- Scrollable Category Filter Pills -->
-      <div class="category-scroll-tabs">
-        <button class="tab-pill-btn active" onclick="selectCategory('global', this)">Global Top 50</button>
-        <button class="tab-pill-btn" onclick="selectCategory('indonesia', this)">Viral Indonesia</button>
-        <button class="tab-pill-btn" onclick="selectCategory('rnb', this)">R&B & Soul</button>
-        <button class="tab-pill-btn" onclick="selectCategory('lofi', this)">Lo-Fi Santai</button>
-        <button class="tab-pill-btn" onclick="selectCategory('acoustic', this)">Akustik Senja</button>
-        <button class="tab-pill-btn" onclick="selectCategory('rock', this)">Indie Rock</button>
-      </div>
-
-      <!-- Tracks Grid Section -->
-      <section>
-        <div class="section-controls-bar">
-          <div class="section-heading-text">
-            <span id="current-category-title">Daftar Lagu Populer</span>
-          </div>
-          <span class="section-meta-count" id="tracks-total-badge">Memuat...</span>
+      <!-- RIGHT: CURATED FEED & CATALOG -->
+      <section class="catalog-feed-column">
+        
+        <!-- Filter Pills -->
+        <div class="filter-pills-row">
+          <button class="chip-pill-action is-selected" onclick="selectCategory('global', this)">Global Hits</button>
+          <button class="chip-pill-action" onclick="selectCategory('indonesia', this)">Indonesia</button>
+          <button class="chip-pill-action" onclick="selectCategory('lofi', this)">Lo-Fi</button>
+          <button class="chip-pill-action" onclick="selectCategory('rnb', this)">R&B</button>
+          <button class="chip-pill-action" onclick="selectCategory('acoustic', this)">Acoustic</button>
+          <button class="chip-pill-action" onclick="selectCategory('rock', this)">Alternative</button>
+          <button class="chip-pill-action" onclick="viewFavorites(this)">Disukai (<span id="fav-count">0</span>)</button>
         </div>
 
-        <div class="tracks-card-grid" id="tracks-container">
-          <!-- Dynamically populated -->
+        <!-- Section Title -->
+        <div class="catalog-meta-headline">
+          <h2 id="catalog-headline">Tangga Lagu Populer Global</h2>
+          <span class="feed-count-pill" id="catalog-count">Memuat katalog...</span>
         </div>
+
+        <!-- Track List Rows -->
+        <div class="track-index-stream" id="tracks-stream-container"></div>
+
       </section>
 
     </main>
 
   </div>
 
-  <!-- ── 3. FLOATING DOCK AUDIO PLAYER ── -->
-  <footer class="dock-player">
-
-    <!-- Left: Track Details -->
-    <div class="dock-left-meta">
-      <div class="dock-cover-thumb">
-        <img id="dock-cover-img" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100" alt="Cover">
+  <!-- Synced Lyrics Drawer -->
+  <aside class="studio-lyrics-overlay" id="lyrics-drawer">
+    <div class="lyrics-modal-header">
+      <div>
+        <h3>Lirik Karaoke</h3>
+        <p style="font-size:0.75rem; color:var(--text-sub); margin-top:2px;" id="lyrics-track-artist">Lirik tersinkronisasi otomatis</p>
       </div>
-      <div class="dock-text-meta">
-        <div class="dock-track-name" id="dock-track-name">Vall Music Player</div>
-        <div class="dock-track-sub">
-          <span id="dock-artist-name">Pilih lagu untuk memulai</span>
-          <span class="stream-quality-tag" id="dock-badge">320K HD</span>
-        </div>
-      </div>
-      <button class="btn-track-heart" id="dock-heart-btn" onclick="toggleCurrentFavorite()" style="font-size: 16px; margin-left: 6px;">
-        <i class="fa-regular fa-heart"></i>
-      </button>
+      <button class="btn-close-modal" onclick="toggleLyricsDrawer(false)">✕</button>
     </div>
-
-    <!-- Center: Playback Controls & Seekbar -->
-    <div class="dock-center-transport">
-      <div class="transport-controls-row">
-        <button class="transport-btn" id="btn-shuffle-toggle" onclick="toggleShuffle()" title="Acak">
-          <i class="fa-solid fa-shuffle"></i>
-        </button>
-        <button class="transport-btn" onclick="playPreviousTrack()" title="Sebelumnya">
-          <i class="fa-solid fa-backward-step"></i>
-        </button>
-        <button class="transport-btn btn-master-play" id="btn-play-pause" onclick="togglePlayback()" title="Putar / Jeda">
-          <i class="fa-solid fa-play"></i>
-        </button>
-        <button class="transport-btn" onclick="playNextTrack()" title="Berikutnya">
-          <i class="fa-solid fa-forward-step"></i>
-        </button>
-        <button class="transport-btn" id="btn-repeat-toggle" onclick="toggleRepeat()" title="Ulangi">
-          <i class="fa-solid fa-repeat"></i>
-        </button>
-      </div>
-
-      <div class="progress-seek-row">
-        <span class="timestamp-label" id="current-time-text">0:00</span>
-        <div class="scrub-track-bar" id="scrub-bar" onclick="scrubPlayback(event)">
-          <div class="scrub-fill-bar" id="scrub-progress"></div>
-        </div>
-        <span class="timestamp-label" id="total-time-text">0:00</span>
-      </div>
+    <div class="lyrics-line-stream" id="lyrics-viewport">
+      <div class="lyric-phrase-item is-current-lyric">Pilih lagu untuk melihat lirik</div>
     </div>
+  </aside>
 
-    <!-- Right: Tools & Volume -->
-    <div class="dock-right-tools">
-      <button class="transport-btn" onclick="toggleLyricsModal()" title="Lirik Karaoke" id="lyrics-btn-icon">
-        <i class="fa-solid fa-microphone"></i>
-      </button>
-      <button class="transport-btn" onclick="toggleEqualizerPanel()" title="Equalizer">
-        <i class="fa-solid fa-sliders"></i>
-      </button>
-      <button class="transport-btn" onclick="downloadCurrentTrack()" title="Unduh MP3">
-        <i class="fa-solid fa-arrow-down-to-bracket"></i>
-      </button>
-      <div class="volume-group">
-        <button class="transport-btn" onclick="toggleVolumeMute()" id="vol-mute-btn" style="font-size: 13px;">
-          <i class="fa-solid fa-volume-high"></i>
-        </button>
-        <input type="range" class="volume-range-slider" min="0" max="1" step="0.01" value="0.8" id="volume-slider" oninput="setAudioVolume(this.value)">
+  <!-- Link Extractor Modal -->
+  <div class="link-extract-modal" id="extract-modal">
+    <div class="extract-modal-box">
+      <div class="lyrics-modal-header">
+        <h3 style="font-size:1.1rem; color:#fff;">Ekstrak Tautan Audio</h3>
+        <button class="btn-close-modal" onclick="closeImportModal()">✕</button>
       </div>
-    </div>
-
-  </footer>
-
-  <!-- ── 4. SYNCHRONIZED LYRICS MODAL ── -->
-  <div class="lyrics-view-container" id="lyrics-modal">
-    <div class="lyrics-app-header">
-      <div class="lyrics-song-heading">
-        <h2 id="lyrics-song-title">Memuat Lirik...</h2>
-        <p id="lyrics-song-artist">Vall Karaoke Sync</p>
-      </div>
-      <button class="btn-dismiss-lyrics" onclick="toggleLyricsModal(false)">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div class="lyrics-flow-scroll" id="lyrics-viewport">
-      <div class="lyric-phrase-line is-active-line">Pilih lagu untuk melihat lirik tersinkronisasi.</div>
-    </div>
-  </div>
-
-  <!-- ── 5. EQUALIZER DRAWER ── -->
-  <div class="equalizer-drawer-box" id="eq-drawer">
-    <div class="eq-header-row">
-      <div class="eq-title-label">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Studio Equalizer (10-Band)</span>
-      </div>
-      <button class="btn-dismiss-lyrics" onclick="toggleEqualizerPanel()" style="width:28px;height:28px;font-size:12px;">✕</button>
-    </div>
-
-    <div class="eq-preset-chip-row">
-      <button class="eq-chip-btn active" onclick="applyPreset('flat', this)">Studio Flat</button>
-      <button class="eq-chip-btn" onclick="applyPreset('bass', this)">Bass Punch</button>
-      <button class="eq-chip-btn" onclick="applyPreset('vocal', this)">Vocal Lift</button>
-      <button class="eq-chip-btn" onclick="applyPreset('lofi', this)">Late Night</button>
-      <button class="eq-chip-btn" onclick="applyPreset('acoustic', this)">Acoustic</button>
-    </div>
-
-    <div class="eq-sliders-rack" id="eq-bands-box"></div>
-  </div>
-
-  <!-- ── 6. LINK IMPORT MODAL ── -->
-  <div class="import-link-modal" id="import-modal">
-    <div class="import-modal-inner">
-      <div class="modal-headline">
-        <h3><i class="fa-solid fa-link"></i> Import Tautan Lagu</h3>
-        <button class="btn-dismiss-lyrics" onclick="closeImportDialog()" style="width:28px;height:28px;font-size:12px;">✕</button>
-      </div>
-      <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
-        Tempelkan tautan lagu audio langsung untuk memutar versi durasi penuh dan mengunduh format MP3.
+      <p style="font-size:0.82rem; color:var(--text-sub); line-height:1.45;">
+        Tempelkan tautan lagu untuk diputar dalam durasi penuh secara instan.
       </p>
-      <input type="text" class="import-url-field" id="import-input-url" placeholder="Tempelkan URL tautan lagu di sini..." />
-      <button class="btn-submit-import" onclick="handleImportSubmit()">
-        <i class="fa-solid fa-play"></i>
-        <span>Ekstrak & Putar Lagu</span>
-      </button>
+      <input type="text" class="extract-input-rail" id="extract-url-input" placeholder="Tempel URL lagu di sini..." />
+      <button class="btn-submit-action" onclick="handleImportSubmit()">Ekstrak & Putar</button>
     </div>
   </div>
 
-  <!-- ── 7. MOBILE BOTTOM NAVIGATION (Phones Only) ── -->
-  <nav class="mobile-bottom-nav">
-    <a class="mobile-nav-item active" onclick="selectCategory('global'); updateMobileNav(this)">
-      <i class="fa-solid fa-compass"></i>
-      <span>Jelajah</span>
-    </a>
-    <a class="mobile-nav-item" onclick="selectCategory('indonesia'); updateMobileNav(this)">
-      <i class="fa-solid fa-fire"></i>
-      <span>Trending</span>
-    </a>
-    <a class="mobile-nav-item" onclick="viewFavorites(); updateMobileNav(this)">
-      <i class="fa-solid fa-heart"></i>
-      <span>Disukai</span>
-    </a>
-    <a class="mobile-nav-item" onclick="toggleLyricsModal()">
-      <i class="fa-solid fa-microphone-lines"></i>
-      <span>Lirik</span>
-    </a>
-    <a class="mobile-nav-item" onclick="toggleEqualizerPanel()">
-      <i class="fa-solid fa-sliders"></i>
-      <span>Equalizer</span>
-    </a>
-  </nav>
+  <!-- Toast -->
+  <div class="studio-toast-box" id="studio-toast">Notifikasi</div>
 
-  <!-- Toast Notification -->
-  <div class="system-toast" id="system-toast">Notifikasi sistem</div>
-
-  <!-- Audio Element -->
+  <!-- Native Audio Tag -->
   <audio id="native-audio" crossorigin="anonymous" preload="auto"></audio>
 
-  <!-- ── JAVASCRIPT MASTER CLIENT ENGINE ── -->
+  <!-- Master JavaScript Engine -->
   <script>
     const appState = {
       currentTrack: null,
@@ -1860,137 +1032,65 @@
       repeatMode: 'none',
       queue: [],
       queueIndex: -1,
-      favorites: JSON.parse(localStorage.getItem('vall_favs_v2') || '[]'),
+      favorites: JSON.parse(localStorage.getItem('vall_favs_deck') || '[]'),
       lyrics: [],
       currentLyricIdx: -1,
       prevVolume: 0.8
     };
 
     const audioPlayer = document.getElementById('native-audio');
-    let spotlightTrack = null;
-    let audioContext = null;
-    let biquadFilters = [];
-    const FREQ_BANDS = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
-    const EQ_PRESETS = {
-      flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      bass: [8, 6, 4, 2, 0, 0, 1, 2, 2, 3],
-      vocal: [-2, -1, 0, 2, 5, 4, 3, 1, 0, -1],
-      lofi: [-3, 2, 3, 2, 0, -2, -3, -5, -6, -8],
-      acoustic: [3, 2, 0, 1, 2, 3, 3, 2, 1, 0]
-    };
+    let streamSessionId = 0;
 
-    // ── Init ──
     window.addEventListener('DOMContentLoaded', () => {
-      buildEqualizerUI();
-      updateFavoritesBadge();
+      updateFavCount();
       selectCategory('global');
       initSearch();
       initKeyboard();
 
       audioPlayer.addEventListener('timeupdate', onTimeUpdate);
       audioPlayer.addEventListener('ended', onTrackEnded);
+      audioPlayer.addEventListener('loadedmetadata', () => {
+        if (audioPlayer.duration && isFinite(audioPlayer.duration) && audioPlayer.duration > 1) {
+          document.getElementById('total-time').innerText = formatClock(audioPlayer.duration);
+        }
+      });
     });
 
-    // ── Web Audio DSP ──
-    function setupAudioDSP() {
-      if (audioContext) return;
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioCtx();
-        const source = audioContext.createMediaElementSource(audioPlayer);
-
-        biquadFilters = FREQ_BANDS.map(freq => {
-          const filter = audioContext.createBiquadFilter();
-          filter.type = 'peaking';
-          filter.frequency.value = freq;
-          filter.Q.value = 1.4;
-          filter.gain.value = 0;
-          return filter;
-        });
-
-        let prev = source;
-        biquadFilters.forEach(f => {
-          prev.connect(f);
-          prev = f;
-        });
-        prev.connect(audioContext.destination);
-      } catch (e) {
-        console.warn('Audio DSP initialized in direct mode');
-      }
-    }
-
-    function buildEqualizerUI() {
-      const box = document.getElementById('eq-bands-box');
-      box.innerHTML = '';
-      FREQ_BANDS.forEach((freq, idx) => {
-        const col = document.createElement('div');
-        col.className = 'eq-column';
-        const label = freq >= 1000 ? `${freq / 1000}k` : `${freq}`;
-        col.innerHTML = `
-          <span class="eq-db-tag" id="eq-lbl-${idx}">0dB</span>
-          <input type="range" class="eq-vertical-input" min="-12" max="12" step="1" value="0" oninput="onEqSliderChange(${idx}, this.value)">
-          <span class="eq-freq-tag">${label}</span>
-        `;
-        box.appendChild(col);
-      });
-    }
-
-    function onEqSliderChange(idx, val) {
-      if (biquadFilters[idx]) biquadFilters[idx].gain.value = parseFloat(val);
-      const lbl = document.getElementById(`eq-lbl-${idx}`);
-      if (lbl) lbl.innerText = `${val > 0 ? '+' : ''}${val}dB`;
-    }
-
-    function applyPreset(name, btn) {
-      document.querySelectorAll('.eq-chip-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      const preset = EQ_PRESETS[name];
-      if (!preset) return;
-      preset.forEach((val, idx) => {
-        onEqSliderChange(idx, val);
-        const input = document.querySelectorAll('.eq-vertical-input')[idx];
-        if (input) input.value = val;
-      });
-      notifyToast(`Preset Equalizer: ${name.toUpperCase()}`);
-    }
-
-    function toggleEqualizerPanel() {
-      document.getElementById('eq-drawer').classList.toggle('show');
-    }
-
-    // ── Category & Data Fetcher ──
+    // Category Selector
     async function selectCategory(cat, btn) {
       if (btn) {
-        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-pill-btn').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
+        document.querySelectorAll('.chip-pill-action').forEach(b => b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
       }
 
-      const titleMap = {
+      const mapTitle = {
         global: 'Tangga Lagu Populer Global',
         indonesia: 'Trending Hits Indonesia',
-        lofi: 'Santai & Midnight Lo-Fi',
+        lofi: 'Midnight Lo-Fi Chill',
         rnb: 'R&B & Soul Pilihan',
         acoustic: 'Akustik & Indie Akrab',
         rock: 'Indie & Alternative Rock'
       };
 
-      document.getElementById('current-category-title').innerText = titleMap[cat] || 'Koleksi Musik';
-      document.getElementById('tracks-total-badge').innerText = 'Memuat lagu...';
+      document.getElementById('catalog-headline').innerText = mapTitle[cat] || 'Katalog Musik';
+      document.getElementById('catalog-count').innerText = 'Memuat katalog...';
 
       try {
         const res = await fetch(`/api/music/charts?category=${cat}`);
         const data = await res.json();
         if (data.status && data.tracks && data.tracks.length > 0) {
-          renderGrid(data.tracks);
-          document.getElementById('tracks-total-badge').innerText = `${data.tracks.length} Lagu`;
-          updateSpotlight(data.tracks[0]);
+          renderTracks(data.tracks);
+          document.getElementById('catalog-count').innerText = `${data.tracks.length} Lagu`;
+          if (!appState.currentTrack) {
+            updateDeckPreview(data.tracks[0]);
+          }
         }
       } catch (err) {
         notifyToast('Gagal memuat katalog: ' + err.message);
       }
     }
 
+    // Search Engine
     function initSearch() {
       const input = document.getElementById('search-input');
       let timer = null;
@@ -1998,15 +1098,15 @@
         clearTimeout(timer);
         const q = e.target.value.trim();
         if (!q) return;
+
         timer = setTimeout(async () => {
-          document.getElementById('current-category-title').innerText = `Hasil Pencarian: "${q}"`;
+          document.getElementById('catalog-headline').innerText = `Hasil: "${q}"`;
           try {
             const res = await fetch(`/api/music/search?q=${encodeURIComponent(q)}`);
             const data = await res.json();
             if (data.status && data.tracks) {
-              renderGrid(data.tracks);
-              document.getElementById('tracks-total-badge').innerText = `${data.tracks.length} Hasil`;
-              if (data.tracks.length > 0) updateSpotlight(data.tracks[0]);
+              renderTracks(data.tracks);
+              document.getElementById('catalog-count').innerText = `${data.tracks.length} Hasil`;
             }
           } catch (e) {
             notifyToast('Pencarian gagal: ' + e.message);
@@ -2015,76 +1115,65 @@
       });
     }
 
-    // ── Render Cards ──
-    function renderGrid(tracks) {
-      const container = document.getElementById('tracks-container');
+    // Render Track Rows
+    function renderTracks(tracks) {
+      const container = document.getElementById('tracks-stream-container');
       container.innerHTML = '';
 
-      tracks.forEach((t) => {
+      tracks.forEach((t, i) => {
         const isFav = appState.favorites.some(f => f.id === t.id);
-        const card = document.createElement('div');
-        card.className = `music-track-card ${appState.currentTrack?.id === t.id ? 'is-active' : ''}`;
-        
-        card.innerHTML = `
-          <div class="card-thumbnail-box">
-            <img src="${t.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300'}" alt="${safeText(t.title)}" loading="lazy">
-            <div class="card-play-action">
-              <i class="fa-solid ${appState.currentTrack?.id === t.id && appState.isPlaying ? 'fa-pause' : 'fa-play'}"></i>
-            </div>
+        const isActive = appState.currentTrack?.id === t.id;
+
+        const row = document.createElement('div');
+        row.className = `stream-track-card ${isActive ? 'is-active-row' : ''}`;
+        row.innerHTML = `
+          <div class="row-index-digit">${i + 1 < 10 ? '0' : ''}${i + 1}</div>
+          <img class="row-cover-thumb" src="${t.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100'}" alt="${escapeText(t.title)}" loading="lazy">
+          <div class="row-title-block">
+            <div class="row-title-name">${escapeText(t.title)}</div>
+            <div class="row-artist-name">${escapeText(t.artist)}</div>
           </div>
-          <div class="card-info-box">
-            <div class="card-track-title" title="${safeText(t.title)}">${safeText(t.title)}</div>
-            <div class="card-track-artist" title="${safeText(t.artist)}">${safeText(t.artist)}</div>
-            <div class="card-footer-row">
-              <span>${t.durationFormatted || '3:30'}</span>
-              <button class="btn-track-heart ${isFav ? 'active' : ''}">
-                <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-              </button>
-            </div>
+          <div class="row-duration-tag">${t.durationFormatted || '3:30'}</div>
+          <div>
+            <button class="row-heart-btn ${isFav ? 'is-fav' : ''}">
+              <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+            </button>
           </div>
         `;
 
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-track-heart')) {
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('.row-heart-btn')) {
             e.stopPropagation();
-            toggleFavoriteDirect(t, card.querySelector('.btn-track-heart'));
+            toggleFavoriteDirect(t, row.querySelector('.row-heart-btn'));
             return;
           }
           startPlayback(t);
         });
 
-        container.appendChild(card);
+        container.appendChild(row);
       });
     }
 
-    function safeText(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
-
-    function updateSpotlight(track) {
+    function updateDeckPreview(track) {
       if (!track) return;
-      spotlightTrack = track;
-      document.getElementById('spotlight-title').innerText = track.title;
-      document.getElementById('spotlight-desc').innerText = `${track.artist} • Album: ${track.album || 'Single'} • Resolusi Audio Penuh HD 320k`;
-      document.getElementById('spotlight-art').src = track.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500';
+      document.getElementById('deck-title-text').innerText = track.title;
+      document.getElementById('deck-artist-text').innerText = track.artist;
+      document.getElementById('deck-cover-art').src = track.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500';
+      document.getElementById('total-time').innerText = track.durationFormatted || '3:30';
+      updateDeckHeart(track);
     }
 
-    function playSpotlightTrack() {
-      if (spotlightTrack) startPlayback(spotlightTrack);
+    function escapeText(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ── Master Playback Engine ──
-    let streamSessionId = 0;
-
+    // Master Mobile-Ready Audio Stream Pipeline
     async function startPlayback(track) {
       if (!track) return;
-      setupAudioDSP();
-
       appState.currentTrack = track;
       const thisSession = ++streamSessionId;
 
-      // Queue tracking
       const qIdx = appState.queue.findIndex(t => t.id === track.id);
       if (qIdx === -1) {
         appState.queue.push(track);
@@ -2093,103 +1182,79 @@
         appState.queueIndex = qIdx;
       }
 
-      // Update Dock Player
-      document.getElementById('dock-track-name').innerText = track.title;
-      document.getElementById('dock-artist-name').innerText = `${track.artist}`;
-      document.getElementById('dock-cover-img').src = track.cover;
-      document.getElementById('vinyl-wrapper').classList.add('spinning');
-      updateDockHeart();
-      shiftAmbientPalette(track);
+      updateDeckPreview(track);
+      document.getElementById('deck-stream-mode').innerText = 'AAC 320K';
 
-      // Fast initial audio if available
-      if (track.audioUrl) {
-        const directUrl = track.audioUrl.startsWith('http')
-          ? `/api/music/proxy-stream?url=${encodeURIComponent(track.audioUrl)}`
-          : track.audioUrl;
-        audioPlayer.src = directUrl;
-        audioPlayer.crossOrigin = 'anonymous';
-        audioPlayer.play().then(() => {
+      // Direct Stream Endpoint:
+      // Executed synchronously within user tap gesture to prevent iOS Safari & Android autoplay block.
+      const directAudio = (track.downloadUrl && track.downloadUrl.startsWith('http'))
+        ? `/api/music/proxy-stream?url=${encodeURIComponent(track.downloadUrl)}`
+        : null;
+
+      const fullStreamUrl = directAudio || `/api/music/stream-play?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}&preview=${encodeURIComponent(track.audioUrl || '')}`;
+
+      audioPlayer.src = fullStreamUrl;
+      audioPlayer.crossOrigin = 'anonymous';
+
+      const playPromise = audioPlayer.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
           appState.isPlaying = true;
-          syncPlayButtonState();
-          if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-        }).catch(() => {});
+          syncPlayState();
+        }).catch((err) => {
+          console.warn('[Vall Music] Playback waiting:', err.message);
+        });
       }
 
-      // Background Full Audio Resolution (3-5 minutes)
-      try {
-        const res = await fetch(`/api/music/resolve-full?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`);
-        const data = await res.json();
-
-        if (thisSession !== streamSessionId) return;
-
-        if (data.status && data.data && data.data.streamUrl) {
-          const curTime = audioPlayer.currentTime || 0;
-          const wasPlaying = !audioPlayer.paused;
-
-          track.fullStreamUrl = data.data.streamUrl;
-          track.downloadUrl = data.data.directUrl || data.data.streamUrl;
-          track.isFullAudio = true;
-          if (data.data.durationFormatted) {
-            track.durationFormatted = data.data.durationFormatted;
+      // Background metadata enricher (without touching audioPlayer.src)
+      fetch(`/api/music/resolve-full?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (thisSession !== streamSessionId) return;
+          if (d.status && d.data) {
+            track.fullStreamUrl = d.data.streamUrl;
+            track.downloadUrl = d.data.directUrl || d.data.streamUrl;
+            track.isFullAudio = true;
+            if (d.data.durationFormatted) {
+              track.durationFormatted = d.data.durationFormatted;
+              document.getElementById('total-time').innerText = d.data.durationFormatted;
+            }
+            document.getElementById('deck-stream-mode').innerText = 'STUDIO 320K';
           }
+        })
+        .catch(() => {});
 
-          document.getElementById('total-time-text').innerText = data.data.durationFormatted || '3:30';
-          document.getElementById('dock-badge').innerText = 'FULL 320K';
-
-          audioPlayer.src = data.data.streamUrl;
-          audioPlayer.crossOrigin = 'anonymous';
-          audioPlayer.currentTime = curTime;
-
-          if (wasPlaying) {
-            await audioPlayer.play();
-            appState.isPlaying = true;
-            syncPlayButtonState();
-          }
-        }
-      } catch (err) {}
-
-      // Fetch Synced Lyrics
       loadKaraokeLyrics(track.title, track.artist);
+      highlightActiveRow();
     }
 
     function togglePlayback() {
       if (!appState.currentTrack) return;
-      setupAudioDSP();
       if (appState.isPlaying) {
         audioPlayer.pause();
         appState.isPlaying = false;
-        document.getElementById('vinyl-wrapper').classList.remove('spinning');
       } else {
         audioPlayer.play();
         appState.isPlaying = true;
-        document.getElementById('vinyl-wrapper').classList.add('spinning');
-        if (audioContext && audioContext.state === 'suspended') audioContext.resume();
       }
-      syncPlayButtonState();
+      syncPlayState();
     }
 
-    function syncPlayButtonState() {
-      const btn = document.getElementById('btn-play-pause');
+    function syncPlayState() {
+      const btn = document.getElementById('btn-play-trigger');
       btn.innerHTML = `<i class="fa-solid ${appState.isPlaying ? 'fa-pause' : 'fa-play'}"></i>`;
 
       const aura = document.getElementById('ambient-aura');
       if (aura) {
-        if (appState.isPlaying) {
-          aura.classList.remove('is-paused');
-          aura.classList.add('is-playing');
-        } else {
-          aura.classList.remove('is-playing');
-          aura.classList.add('is-paused');
-        }
+        aura.classList.toggle('is-playing', appState.isPlaying);
+        aura.classList.toggle('is-paused', !appState.isPlaying);
       }
+    }
 
-      document.querySelectorAll('.music-track-card').forEach(c => {
-        const isCurrent = c.querySelector('.card-track-title')?.innerText === appState.currentTrack?.title;
-        c.classList.toggle('is-active', isCurrent);
-        const icon = c.querySelector('.card-play-action i');
-        if (icon && isCurrent) {
-          icon.className = `fa-solid ${appState.isPlaying ? 'fa-pause' : 'fa-play'}`;
-        }
+    function highlightActiveRow() {
+      document.querySelectorAll('.stream-track-card').forEach(c => {
+        const isCurrent = c.querySelector('.row-title-name')?.innerText === appState.currentTrack?.title;
+        c.classList.toggle('is-active-row', isCurrent);
       });
     }
 
@@ -2219,14 +1284,13 @@
         playNextTrack();
       } else {
         appState.isPlaying = false;
-        syncPlayButtonState();
-        document.getElementById('vinyl-wrapper').classList.remove('spinning');
+        syncPlayState();
       }
     }
 
     function toggleShuffle() {
       appState.isShuffle = !appState.isShuffle;
-      document.getElementById('btn-shuffle-toggle').classList.toggle('active', appState.isShuffle);
+      document.getElementById('btn-shuffle').classList.toggle('is-active', appState.isShuffle);
       notifyToast(`Mode Acak: ${appState.isShuffle ? 'Aktif' : 'Nonaktif'}`);
     }
 
@@ -2235,22 +1299,23 @@
       else if (appState.repeatMode === 'all') appState.repeatMode = 'one';
       else appState.repeatMode = 'none';
 
-      const btn = document.getElementById('btn-repeat-toggle');
-      btn.classList.toggle('active', appState.repeatMode !== 'none');
+      const btn = document.getElementById('btn-repeat');
+      btn.classList.toggle('is-active', appState.repeatMode !== 'none');
       btn.innerHTML = `<i class="fa-solid fa-repeat"></i>${appState.repeatMode === 'one' ? '<span style="font-size:9px;vertical-align:super">1</span>' : ''}`;
       notifyToast(`Ulangi: ${appState.repeatMode.toUpperCase()}`);
     }
 
-    // ── Scrub & Volume ──
+    // Timeline Scrubber
     function onTimeUpdate() {
       const cur = audioPlayer.currentTime || 0;
-      const dur = audioPlayer.duration || 1;
-      const pct = (cur / dur) * 100;
-      document.getElementById('scrub-progress').style.width = `${pct}%`;
-      document.getElementById('current-time-text').innerText = formatClock(cur);
-      if (dur > 1 && !isNaN(dur)) {
-        document.getElementById('total-time-text').innerText = formatClock(dur);
+      let dur = audioPlayer.duration;
+      if (!dur || isNaN(dur) || !isFinite(dur) || dur <= 1) {
+        dur = appState.currentTrack?.duration || 210;
       }
+      const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
+      document.getElementById('scrub-fill').style.width = `${pct}%`;
+      document.getElementById('cur-time').innerText = formatClock(cur);
+      document.getElementById('total-time').innerText = formatClock(dur);
       syncLyricsWithTime(cur);
     }
 
@@ -2266,20 +1331,20 @@
       updateVolIcon(audioPlayer.volume);
     }
 
-    function toggleVolumeMute() {
+    function toggleMute() {
       if (audioPlayer.volume > 0) {
         appState.prevVolume = audioPlayer.volume;
         audioPlayer.volume = 0;
-        document.getElementById('volume-slider').value = 0;
+        document.getElementById('vol-slider').value = 0;
       } else {
         audioPlayer.volume = appState.prevVolume || 0.8;
-        document.getElementById('volume-slider').value = audioPlayer.volume;
+        document.getElementById('vol-slider').value = audioPlayer.volume;
       }
       updateVolIcon(audioPlayer.volume);
     }
 
     function updateVolIcon(vol) {
-      const btn = document.getElementById('vol-mute-btn');
+      const btn = document.getElementById('btn-vol-mute');
       if (vol === 0) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
       else if (vol < 0.5) btn.innerHTML = '<i class="fa-solid fa-volume-low"></i>';
       else btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
@@ -2292,66 +1357,12 @@
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    // ── Dynamic Living Aura Color Engine ──
-    const AURA_PALETTES = [
-      {
-        orb1: 'radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, rgba(99, 102, 241, 0.45) 45%, transparent 70%)',
-        orb2: 'radial-gradient(circle, rgba(6, 182, 212, 0.75) 0%, rgba(16, 185, 129, 0.45) 50%, transparent 70%)',
-        orb3: 'radial-gradient(circle, rgba(244, 63, 94, 0.7) 0%, rgba(236, 72, 153, 0.4) 50%, transparent 70%)',
-        orb4: 'radial-gradient(circle, rgba(245, 158, 11, 0.65) 0%, rgba(239, 68, 68, 0.35) 50%, transparent 70%)'
-      },
-      {
-        orb1: 'radial-gradient(circle, rgba(236, 72, 153, 0.8) 0%, rgba(168, 85, 247, 0.45) 45%, transparent 70%)',
-        orb2: 'radial-gradient(circle, rgba(59, 130, 246, 0.75) 0%, rgba(6, 182, 212, 0.45) 50%, transparent 70%)',
-        orb3: 'radial-gradient(circle, rgba(16, 185, 129, 0.7) 0%, rgba(52, 211, 153, 0.4) 50%, transparent 70%)',
-        orb4: 'radial-gradient(circle, rgba(244, 63, 94, 0.65) 0%, rgba(245, 158, 11, 0.35) 50%, transparent 70%)'
-      },
-      {
-        orb1: 'radial-gradient(circle, rgba(16, 185, 129, 0.8) 0%, rgba(6, 182, 212, 0.45) 45%, transparent 70%)',
-        orb2: 'radial-gradient(circle, rgba(245, 158, 11, 0.75) 0%, rgba(239, 68, 68, 0.45) 50%, transparent 70%)',
-        orb3: 'radial-gradient(circle, rgba(99, 102, 241, 0.7) 0%, rgba(139, 92, 246, 0.4) 50%, transparent 70%)',
-        orb4: 'radial-gradient(circle, rgba(236, 72, 153, 0.65) 0%, rgba(217, 70, 239, 0.35) 50%, transparent 70%)'
-      },
-      {
-        orb1: 'radial-gradient(circle, rgba(59, 130, 246, 0.8) 0%, rgba(99, 102, 241, 0.45) 45%, transparent 70%)',
-        orb2: 'radial-gradient(circle, rgba(236, 72, 153, 0.75) 0%, rgba(244, 63, 94, 0.45) 50%, transparent 70%)',
-        orb3: 'radial-gradient(circle, rgba(245, 158, 11, 0.7) 0%, rgba(251, 191, 36, 0.4) 50%, transparent 70%)',
-        orb4: 'radial-gradient(circle, rgba(6, 182, 212, 0.65) 0%, rgba(16, 185, 129, 0.35) 50%, transparent 70%)'
-      }
-    ];
-
-    let currentPaletteIdx = 0;
-
-    function applyAuraPalette(palette) {
-      const orb1 = document.getElementById('aura-orb-1');
-      const orb2 = document.getElementById('aura-orb-2');
-      const orb3 = document.getElementById('aura-orb-3');
-      const orb4 = document.getElementById('aura-orb-4');
-      if (orb1) orb1.style.background = palette.orb1;
-      if (orb2) orb2.style.background = palette.orb2;
-      if (orb3) orb3.style.background = palette.orb3;
-      if (orb4) orb4.style.background = palette.orb4;
-    }
-
-    function shiftAmbientPalette(track) {
-      currentPaletteIdx = (currentPaletteIdx + 1) % AURA_PALETTES.length;
-      applyAuraPalette(AURA_PALETTES[currentPaletteIdx]);
-    }
-
-    // Auto-cycle palettes while music is playing
-    setInterval(() => {
-      if (!appState.isPlaying) return;
-      currentPaletteIdx = (currentPaletteIdx + 1) % AURA_PALETTES.length;
-      applyAuraPalette(AURA_PALETTES[currentPaletteIdx]);
-    }, 5000);
-
-    // ── Synced Lyrics ──
+    // Synced Karaoke Lyrics
     async function loadKaraokeLyrics(title, artist) {
       appState.lyrics = [];
       const box = document.getElementById('lyrics-viewport');
-      box.innerHTML = '<div class="lyric-phrase-line is-active-line">Memuat lirik tersinkronisasi...</div>';
-      document.getElementById('lyrics-song-title').innerText = title;
-      document.getElementById('lyrics-song-artist').innerText = artist;
+      box.innerHTML = '<div class="lyric-phrase-item is-current-lyric">Memuat lirik tersinkronisasi...</div>';
+      document.getElementById('lyrics-track-artist').innerText = `${title} • ${artist}`;
 
       try {
         const res = await fetch(`/api/music/lyrics?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
@@ -2360,10 +1371,10 @@
           appState.lyrics = data.parsed;
           renderLyricsDisplay();
         } else {
-          box.innerHTML = '<div class="lyric-phrase-line is-active-line">♪ Lirik tidak tersedia untuk track ini ♪</div>';
+          box.innerHTML = '<div class="lyric-phrase-item is-current-lyric">♪ Lirik tidak tersedia untuk track ini ♪</div>';
         }
       } catch (e) {
-        box.innerHTML = '<div class="lyric-phrase-line is-active-line">♪ Lirik tidak dapat dimuat ♪</div>';
+        box.innerHTML = '<div class="lyric-phrase-item is-current-lyric">♪ Lirik tidak dapat dimuat ♪</div>';
       }
     }
 
@@ -2372,8 +1383,8 @@
       box.innerHTML = '';
       appState.lyrics.forEach((item, idx) => {
         const line = document.createElement('div');
-        line.className = 'lyric-phrase-line';
-        line.id = `lyric-phrase-${idx}`;
+        line.className = 'lyric-phrase-item';
+        line.id = `lyric-row-${idx}`;
         line.innerText = item.text;
         line.onclick = () => {
           if (item.time !== undefined) audioPlayer.currentTime = item.time;
@@ -2392,44 +1403,44 @@
 
       if (targetIdx !== appState.currentLyricIdx && targetIdx !== -1) {
         appState.currentLyricIdx = targetIdx;
-        document.querySelectorAll('.lyric-phrase-line').forEach(l => l.classList.remove('is-active-line'));
-        const el = document.getElementById(`lyric-phrase-${targetIdx}`);
+        document.querySelectorAll('.lyric-phrase-item').forEach(l => l.classList.remove('is-current-lyric'));
+        const el = document.getElementById(`lyric-row-${targetIdx}`);
         if (el) {
-          el.classList.add('is-active-line');
+          el.classList.add('is-current-lyric');
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     }
 
-    function toggleLyricsModal(forceState) {
-      const modal = document.getElementById('lyrics-modal');
-      const btn = document.getElementById('lyrics-btn-icon');
-      if (typeof forceState === 'boolean') modal.classList.toggle('show', forceState);
-      else modal.classList.toggle('show');
-      btn.classList.toggle('active', modal.classList.contains('show'));
+    function toggleLyricsDrawer(forceState) {
+      const drawer = document.getElementById('lyrics-drawer');
+      const btn = document.getElementById('btn-top-lyrics');
+      if (typeof forceState === 'boolean') drawer.classList.toggle('is-visible', forceState);
+      else drawer.classList.toggle('is-visible');
+      if (btn) btn.classList.toggle('is-active', drawer.classList.contains('is-visible'));
     }
 
-    // ── Favorites ──
+    // Favorites Engine
     function toggleFavoriteDirect(track, btn) {
       const idx = appState.favorites.findIndex(f => f.id === track.id);
       if (idx === -1) {
         appState.favorites.push(track);
         if (btn) {
-          btn.classList.add('active');
+          btn.classList.add('is-fav');
           btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
         }
         notifyToast(`Disukai: ${track.title}`);
       } else {
         appState.favorites.splice(idx, 1);
         if (btn) {
-          btn.classList.remove('active');
+          btn.classList.remove('is-fav');
           btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
         }
-        notifyToast(`Dihapus dari favorit`);
+        notifyToast('Dihapus dari favorit');
       }
-      localStorage.setItem('vall_favs_v2', JSON.stringify(appState.favorites));
-      updateFavoritesBadge();
-      updateDockHeart();
+      localStorage.setItem('vall_favs_deck', JSON.stringify(appState.favorites));
+      updateFavCount();
+      updateDeckHeart(appState.currentTrack);
     }
 
     function toggleCurrentFavorite() {
@@ -2437,51 +1448,51 @@
       toggleFavoriteDirect(appState.currentTrack);
     }
 
-    function updateDockHeart() {
-      const btn = document.getElementById('dock-heart-btn');
-      if (!appState.currentTrack) return;
-      const isFav = appState.favorites.some(f => f.id === appState.currentTrack.id);
-      btn.classList.toggle('active', isFav);
+    function updateDeckHeart(track) {
+      const btn = document.getElementById('deck-heart-btn');
+      if (!track) return;
+      const isFav = appState.favorites.some(f => f.id === track.id);
+      btn.classList.toggle('is-fav', isFav);
       btn.innerHTML = `<i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>`;
     }
 
-    function updateFavoritesBadge() {
-      document.getElementById('liked-songs-count').innerText = appState.favorites.length;
+    function updateFavCount() {
+      document.getElementById('fav-count').innerText = appState.favorites.length;
     }
 
     function viewFavorites(navBtn) {
-      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-      if (navBtn) navBtn.classList.add('active');
-      document.getElementById('current-category-title').innerText = 'Koleksi Lagu Disukai';
-      document.getElementById('tracks-total-badge').innerText = `${appState.favorites.length} Lagu`;
-      renderGrid(appState.favorites);
+      document.querySelectorAll('.chip-pill-action').forEach(el => el.classList.remove('is-selected'));
+      if (navBtn) navBtn.classList.add('is-selected');
+      document.getElementById('catalog-headline').innerText = 'Koleksi Lagu Disukai';
+      document.getElementById('catalog-count').innerText = `${appState.favorites.length} Lagu`;
+      renderTracks(appState.favorites);
       if (appState.favorites.length === 0) {
-        document.getElementById('tracks-container').innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-tertiary);">
-            <i class="fa-regular fa-heart" style="font-size: 38px; margin-bottom: 14px; color: #ef4444;"></i>
-            <h3 style="color:#fff;">Belum Ada Lagu Favorit</h3>
-            <p style="font-size: 0.85rem; margin-top: 6px;">Klik ikon hati pada lagu untuk menyimpannya di sini.</p>
+        document.getElementById('tracks-stream-container').innerHTML = `
+          <div style="text-align: center; padding: 60px 20px; color: var(--text-mute);">
+            <i class="fa-regular fa-heart" style="font-size: 32px; margin-bottom: 12px; color: var(--accent-coral);"></i>
+            <h3 style="color:#fff; font-size:1rem;">Belum Ada Lagu Favorit</h3>
+            <p style="font-size: 0.82rem; margin-top: 4px;">Klik ikon hati pada lagu untuk menyimpannya di sini.</p>
           </div>
         `;
       }
     }
 
-    // ── Link Importer Modal ──
-    function openImportDialog() {
-      document.getElementById('import-modal').classList.add('show');
+    // Link Extractor
+    function openImportModal() {
+      document.getElementById('extract-modal').classList.add('is-visible');
     }
 
-    function closeImportDialog() {
-      document.getElementById('import-modal').classList.remove('show');
+    function closeImportModal() {
+      document.getElementById('extract-modal').classList.remove('is-visible');
     }
 
     async function handleImportSubmit() {
-      const input = document.getElementById('import-input-url');
+      const input = document.getElementById('extract-url-input');
       const url = input.value.trim();
       if (!url) return notifyToast('Masukkan tautan lagu yang valid');
 
       notifyToast('Mengekstrak audio dari tautan...');
-      closeImportDialog();
+      closeImportModal();
 
       try {
         const res = await fetch('/api/music/spotify/resolve', {
@@ -2501,7 +1512,7 @@
       }
     }
 
-    // ── Download ──
+    // Download MP3
     function downloadCurrentTrack() {
       if (!appState.currentTrack) return notifyToast('Pilih lagu terlebih dahulu');
       const targetUrl = appState.currentTrack.downloadUrl || appState.currentTrack.fullStreamUrl || appState.currentTrack.audioUrl;
@@ -2517,21 +1528,15 @@
       document.body.removeChild(a);
     }
 
-    // ── Mobile Bottom Nav Helper ──
-    function updateMobileNav(el) {
-      document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
-      if (el) el.classList.add('active');
-    }
-
-    // ── Toast ──
+    // Toast
     function notifyToast(msg) {
-      const toast = document.getElementById('system-toast');
+      const toast = document.getElementById('studio-toast');
       toast.innerText = msg;
-      toast.classList.add('visible');
-      setTimeout(() => toast.classList.remove('visible'), 2600);
+      toast.classList.add('is-shown');
+      setTimeout(() => toast.classList.remove('is-shown'), 2600);
     }
 
-    // ── Keyboard ──
+    // Keyboard Shortcuts
     function initKeyboard() {
       window.addEventListener('keydown', (e) => {
         if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
@@ -2549,9 +1554,9 @@
           e.preventDefault();
           audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 5, 0);
         } else if (e.code === 'KeyM') {
-          toggleVolumeMute();
+          toggleMute();
         } else if (e.code === 'KeyL') {
-          toggleLyricsModal();
+          toggleLyricsDrawer();
         }
       });
     }
