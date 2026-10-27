@@ -234,19 +234,8 @@ const INNERTUBE_KEY = 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30';
 const INNERTUBE_URL = 'https://music.youtube.com/youtubei/v1/search';
 const INNERTUBE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 
-async function resolveFullAudio(title, artist) {
-  const query = `${title} ${artist}`.trim();
-  const cacheKey = query.toLowerCase();
-  if (streamCache.has(cacheKey)) {
-    const cached = streamCache.get(cacheKey);
-    // Cache for 30 minutes
-    if (Date.now() - cached.timestamp < 30 * 60 * 1000) {
-      return cached.data;
-    }
-  }
-
-  // Search YouTube Music for videoId
-  let videoId = null;
+async function searchVideoId(query) {
+  // Method 1: YouTube Music Innertube search
   try {
     const searchRes = await fetch(`${INNERTUBE_URL}?key=${INNERTUBE_KEY}&prettyPrint=false`, {
       method: 'POST',
@@ -278,26 +267,72 @@ async function resolveFullAudio(title, artist) {
         const contents = s?.musicShelfRenderer?.contents || [];
         for (const item of contents) {
           const flex = item?.musicResponsiveListItemRenderer?.flexColumns || [];
-          videoId = flex[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId ||
-                    item?.musicResponsiveListItemRenderer?.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint?.videoId;
-          if (videoId) break;
+          const videoId = flex[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId ||
+                          item?.musicResponsiveListItemRenderer?.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint?.videoId;
+          if (videoId) return videoId;
         }
-        if (videoId) break;
       }
     }
   } catch (e) {
-    console.warn('[Vall Music] Search fallback:', e.message);
+    console.warn('[Vall Music] Innertube search fallback:', e.message);
   }
 
-  if (!videoId && ytdlClient) {
-    // If not found, try raw title query
-    videoId = null;
+  // Method 2: YouTube HTML search fallback
+  try {
+    const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+    const ytRes = await fetch(ytUrl, {
+      headers: { 'User-Agent': INNERTUBE_UA }
+    });
+    if (ytRes.ok) {
+      const html = await ytRes.text();
+      const idx = html.indexOf('/watch?v=');
+      if (idx !== -1) {
+        const videoId = html.substring(idx + 9, idx + 20);
+        if (/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+          return videoId;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[Vall Music] HTML search fallback failed:', e.message);
   }
+
+  return null;
+}
+
+async function resolveFullAudio(title, artist) {
+  const query = `${title} ${artist}`.trim();
+  const cacheKey = query.toLowerCase();
+  if (streamCache.has(cacheKey)) {
+    const cached = streamCache.get(cacheKey);
+    // Cache for 2 hours
+    if (Date.now() - cached.timestamp < 2 * 60 * 60 * 1000) {
+      return cached.data;
+    }
+  }
+
+  const videoId = await searchVideoId(query);
 
   if (videoId && ytdlClient) {
     try {
       const info = await ytdlClient.getInfo(`https://www.youtube.com/watch?v=${videoId}`);
-      const format = chooseFormat(info.formats, { filter: f => f.hasAudio && !f.hasVideo });
+      
+      // CRITICAL FOR MOBILE / IOS SAFARI:
+      // Prioritize AAC / MP4 format (audio/mp4, itag 140) which is natively supported on iOS WebKit & Android.
+      // WebM / Opus is unsupported by iOS Safari in HTML5 audio tags and causes format errors.
+      let format = null;
+      try {
+        format = chooseFormat(info.formats, {
+          filter: f => f.hasAudio && !f.hasVideo && (f.container === 'mp4' || (f.mimeType && f.mimeType.includes('mp4')))
+        });
+      } catch (e) {}
+
+      if (!format) {
+        try {
+          format = chooseFormat(info.formats, { filter: f => f.hasAudio && !f.hasVideo });
+        } catch (e) {}
+      }
+
       if (format && format.url) {
         const durationSec = parseInt(info.videoDetails.lengthSeconds) || 180;
         const result = {
@@ -307,6 +342,8 @@ async function resolveFullAudio(title, artist) {
           durationFormatted: formatSeconds(durationSec),
           streamUrl: `/api/music/proxy-stream?url=${encodeURIComponent(format.url)}`,
           directUrl: format.url,
+          mimeType: format.mimeType?.split(';')?.[0] || 'audio/mp4',
+          container: format.container || 'mp4',
           isFullAudio: true
         };
         streamCache.set(cacheKey, { timestamp: Date.now(), data: result });
@@ -347,45 +384,118 @@ router.get('/resolve-full', async (req, res) => {
 });
 
 /**
- * ── 5. Audio Stream Proxy (Handles CORS & Partial Content / Seeking) ─────────
+ * ── 4.8 Master Mobile Full Stream Play Endpoint ──────────────────────────────
+ * Solves iOS Safari & Android mobile autoplay restrictions by serving
+ * the direct stream URL within the initial user gesture, avoiding asynchronous
+ * src replacement that triggers NotAllowedError on mobile devices.
  */
-router.get('/proxy-stream', async (req, res) => {
-  const audioUrl = req.query.url;
-  if (!audioUrl) {
-    return res.status(400).send('Missing audio URL');
+router.get('/stream-play', async (req, res) => {
+  const title = (req.query.title || '').trim();
+  const artist = (req.query.artist || '').trim();
+  const preview = (req.query.preview || '').trim();
+
+  if (!title) {
+    if (preview) {
+      return proxyMediaStream(preview, req, res, 'audio/mpeg');
+    }
+    return res.status(400).send('Title or preview URL is required');
   }
 
   try {
-    const parsed = new URL(audioUrl);
-    const client = parsed.protocol === 'https:' ? https : http;
+    const fullAudio = await resolveFullAudio(title, artist);
+    if (fullAudio && fullAudio.directUrl) {
+      return proxyMediaStream(fullAudio.directUrl, req, res, fullAudio.mimeType || 'audio/mp4');
+    }
 
+    // Fallback to preview if full audio is unavailable
+    if (preview) {
+      return proxyMediaStream(preview, req, res, 'audio/mpeg');
+    }
+
+    res.status(404).send('Audio stream not available');
+  } catch (err) {
+    console.error('[Vall Music Stream Play Error]:', err.message);
+    if (preview) {
+      return proxyMediaStream(preview, req, res, 'audio/mpeg');
+    }
+    res.status(500).send(err.message);
+  }
+});
+
+/**
+ * ── 5. Audio Stream Proxy (Handles CORS, Redirects, Seeking & Range Requests) ─
+ */
+function proxyMediaStream(targetUrl, req, res, defaultMime = 'audio/mp4', maxRedirects = 5) {
+  if (!targetUrl) {
+    return res.status(400).send('Target audio URL is missing');
+  }
+
+  const doRequest = (currentUrl, redirectsLeft) => {
+    if (redirectsLeft <= 0) {
+      return res.status(502).send('Too many redirects from media source');
+    }
+
+    let parsed;
+    try {
+      parsed = new URL(currentUrl);
+    } catch (e) {
+      return res.status(400).send('Invalid media URL');
+    }
+
+    const client = parsed.protocol === 'https:' ? https : http;
     const proxyHeaders = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      Accept: '*/*'
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      'Accept': '*/*'
     };
     if (req.headers.range) {
       proxyHeaders['Range'] = req.headers.range;
     }
 
-    client.get(audioUrl, { headers: proxyHeaders }, (upstream) => {
-      // Pass status & content-range headers for seeking
+    const upstreamReq = client.get(currentUrl, { headers: proxyHeaders }, (upstream) => {
+      // Follow 3xx HTTP redirects automatically
+      if ([301, 302, 303, 307, 308].includes(upstream.statusCode) && upstream.headers.location) {
+        const nextUrl = new URL(upstream.headers.location, currentUrl).toString();
+        return doRequest(nextUrl, redirectsLeft - 1);
+      }
+
       res.status(upstream.statusCode);
-      ['content-type', 'content-length', 'content-range', 'accept-ranges'].forEach((h) => {
+      ['content-range', 'content-length', 'accept-ranges'].forEach((h) => {
         if (upstream.headers[h]) {
           res.setHeader(h, upstream.headers[h]);
         }
       });
+      // Guarantee Range and MIME headers for iOS Safari and Android media playback
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Content-Type', upstream.headers['content-type'] || defaultMime);
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Headers', 'Range');
-      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.setHeader('Cache-Control', 'public, max-age=7200');
 
       upstream.pipe(res);
-    }).on('error', (err) => {
-      if (!res.headersSent) res.status(502).send(err.message);
     });
-  } catch (err) {
-    res.status(500).send(err.message);
+
+    upstreamReq.on('error', (err) => {
+      if (!res.headersSent) {
+        res.status(502).send(`Stream fetch error: ${err.message}`);
+      }
+    });
+
+    req.on('close', () => {
+      try {
+        upstreamReq.destroy();
+      } catch (e) {}
+    });
+  };
+
+  doRequest(targetUrl, maxRedirects);
+}
+
+router.get('/proxy-stream', (req, res) => {
+  const audioUrl = req.query.url;
+  if (!audioUrl) {
+    return res.status(400).send('Missing audio URL');
   }
+  proxyMediaStream(audioUrl, req, res, 'audio/mp4');
 });
 
 // Helper: Format seconds into mm:ss
