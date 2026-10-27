@@ -12,12 +12,15 @@ const fetch = require('node-fetch');
 const SpotifyScraper = require('./spotifyScraper');
 const spotifyScraper = new SpotifyScraper();
 
-// Optional YTDL instance for extended streaming
+// Cloud-Optimized YTDL Engine (Heroku / AWS / VPS)
+// Bypasses datacenter bot detection & PO-token locks by binding TV & Mweb clients
 let ytdlClient = null;
 let chooseFormat = null;
 try {
   const ytdl = require('@distube/ytdl-core');
-  ytdlClient = new ytdl.Ytdl();
+  ytdlClient = new ytdl.Ytdl({
+    clients: ['tv', 'mweb', 'web_embedded']
+  });
   chooseFormat = ytdl.chooseFormat;
 } catch (e) {
   console.log('[Vall Music] Ytdl initialized in fallback mode');
@@ -90,6 +93,16 @@ router.get('/charts', async (req, res) => {
       const response = await fetch('https://api.deezer.com/chart/0/tracks?limit=25');
       const data = await response.json();
       const tracks = mapDeezerTracks(data.data || []);
+      
+      // Background pre-warming for instant playback on cloud/Heroku
+      if (tracks.length > 0) {
+        setTimeout(() => {
+          resolveFullAudio(tracks[0].title, tracks[0].artist).catch(() => {});
+          if (tracks[1]) resolveFullAudio(tracks[1].title, tracks[1].artist).catch(() => {});
+          if (tracks[2]) resolveFullAudio(tracks[2].title, tracks[2].artist).catch(() => {});
+        }, 50);
+      }
+
       return res.json({ status: true, category: 'Global Top Hits', tracks });
     }
 
@@ -108,6 +121,13 @@ router.get('/charts', async (req, res) => {
     const response = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=25`);
     const data = await response.json();
     const tracks = mapDeezerTracks(data.data || []);
+
+    if (tracks.length > 0) {
+      setTimeout(() => {
+        resolveFullAudio(tracks[0].title, tracks[0].artist).catch(() => {});
+        if (tracks[1]) resolveFullAudio(tracks[1].title, tracks[1].artist).catch(() => {});
+      }, 50);
+    }
 
     res.json({
       status: true,
@@ -235,7 +255,19 @@ const INNERTUBE_URL = 'https://music.youtube.com/youtubei/v1/search';
 const INNERTUBE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 
 async function searchVideoId(query) {
-  // Method 1: YouTube Music Innertube search
+  // Method 1: YTDL Client Search (Fastest, TV client bypasses bot check)
+  if (ytdlClient && ytdlClient.search) {
+    try {
+      const searchResults = await ytdlClient.search(query);
+      if (Array.isArray(searchResults) && searchResults.length > 0 && searchResults[0].id) {
+        return searchResults[0].id;
+      }
+    } catch (e) {
+      console.warn('[Vall Music] Ytdl search fallback:', e.message);
+    }
+  }
+
+  // Method 2: YouTube Music Innertube search
   try {
     const searchRes = await fetch(`${INNERTUBE_URL}?key=${INNERTUBE_KEY}&prettyPrint=false`, {
       method: 'POST',
@@ -255,8 +287,7 @@ async function searchVideoId(query) {
             userAgent: INNERTUBE_UA
           }
         },
-        query: query,
-        params: 'EgWKAQIIAWoOEAMQBBAJEAoQBRAREBU%3D'
+        query: query
       })
     });
 
@@ -277,7 +308,7 @@ async function searchVideoId(query) {
     console.warn('[Vall Music] Innertube search fallback:', e.message);
   }
 
-  // Method 2: YouTube HTML search fallback
+  // Method 3: YouTube HTML search fallback
   try {
     const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
     const ytRes = await fetch(ytUrl, {
@@ -344,9 +375,10 @@ async function resolveFullAudio(title, artist) {
           directUrl: format.url,
           mimeType: format.mimeType?.split(';')?.[0] || 'audio/mp4',
           container: format.container || 'mp4',
+          info,
           isFullAudio: true
         };
-        streamCache.set(cacheKey, { timestamp: Date.now(), data: result });
+        streamCache.set(cacheKey, { timestamp: Date.now(), data: result, info, videoId });
         return result;
       }
     } catch (e) {
@@ -388,6 +420,7 @@ router.get('/resolve-full', async (req, res) => {
  * Solves iOS Safari & Android mobile autoplay restrictions by serving
  * the direct stream URL within the initial user gesture, avoiding asynchronous
  * src replacement that triggers NotAllowedError on mobile devices.
+ * Uses ytdl.download() stream delivery engine to bypass 403 Forbidden.
  */
 router.get('/stream-play', async (req, res) => {
   const title = (req.query.title || '').trim();
@@ -395,26 +428,97 @@ router.get('/stream-play', async (req, res) => {
   const preview = (req.query.preview || '').trim();
 
   if (!title) {
-    if (preview) {
-      return proxyMediaStream(preview, req, res, 'audio/mpeg');
-    }
+    if (preview) return proxyMediaStream(preview, req, res, 'audio/mpeg');
     return res.status(400).send('Title or preview URL is required');
   }
 
   try {
-    const fullAudio = await resolveFullAudio(title, artist);
-    if (fullAudio && fullAudio.directUrl) {
-      return proxyMediaStream(fullAudio.directUrl, req, res, fullAudio.mimeType || 'audio/mp4');
+    const query = `${title} ${artist}`.trim();
+    const cacheKey = query.toLowerCase();
+
+    let info = null;
+    let videoId = null;
+
+    if (streamCache.has(cacheKey)) {
+      const cached = streamCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < 2 * 60 * 60 * 1000) {
+        info = cached.info;
+        videoId = cached.videoId;
+      }
     }
 
-    // Fallback to preview if full audio is unavailable
+    if (!info) {
+      videoId = await searchVideoId(query);
+      if (videoId && ytdlClient) {
+        info = await ytdlClient.getInfo(`https://www.youtube.com/watch?v=${videoId}`);
+        streamCache.set(cacheKey, { timestamp: Date.now(), info, videoId });
+      }
+    }
+
+    if (info && ytdlClient) {
+      // iOS & Mobile Compatibility: Prioritize MP4 container (AAC audio)
+      let filterOption = f => f.hasAudio && !f.hasVideo && (f.container === 'mp4' || (f.mimeType && f.mimeType.includes('mp4')));
+      const hasMp4 = info.formats.some(filterOption);
+      if (!hasMp4) {
+        filterOption = f => f.hasAudio && !f.hasVideo;
+      }
+
+      const downloadOpts = { filter: filterOption };
+
+      // Handle Range Requests (Critical for Mobile Seeking & iOS Safari 2-byte probe)
+      if (req.headers.range) {
+        const parts = req.headers.range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10) || 0;
+        const end = parts[1] ? parseInt(parts[1], 10) : undefined;
+        downloadOpts.range = { start };
+        if (end !== undefined) downloadOpts.range.end = end;
+
+        res.status(206);
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Content-Type', 'audio/mp4');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Headers', 'Range');
+        res.setHeader('Cache-Control', 'public, max-age=7200');
+
+        if (end !== undefined) {
+          res.setHeader('Content-Range', `bytes ${start}-${end}/*`);
+          res.setHeader('Content-Length', (end - start + 1).toString());
+        } else {
+          res.setHeader('Content-Range', `bytes ${start}-*/*`);
+        }
+      } else {
+        res.status(200);
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Content-Type', 'audio/mp4');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Cache-Control', 'public, max-age=7200');
+      }
+
+      const audioStream = ytdlClient.download(info, downloadOpts);
+
+      audioStream.on('error', (err) => {
+        console.error('[Vall Music Stream Error]:', err.message);
+        if (!res.headersSent) {
+          if (preview) proxyMediaStream(preview, req, res, 'audio/mpeg');
+          else res.status(502).send(err.message);
+        }
+      });
+
+      req.on('close', () => {
+        try { audioStream.destroy(); } catch (e) {}
+      });
+
+      return audioStream.pipe(res);
+    }
+
+    // Fallback to preview only if YouTube resolution completely failed
     if (preview) {
       return proxyMediaStream(preview, req, res, 'audio/mpeg');
     }
 
     res.status(404).send('Audio stream not available');
   } catch (err) {
-    console.error('[Vall Music Stream Play Error]:', err.message);
+    console.error('[Vall Music Master Stream Error]:', err.message);
     if (preview) {
       return proxyMediaStream(preview, req, res, 'audio/mpeg');
     }
